@@ -1,0 +1,5 @@
+<div>
+  Enables Single Sign-On with NTLM or Kerberos using Waffle (https://github.com/dblock/waffle).<br />
+  It uses a negotiate filter, and will fall back to a basic filter if negotiate fails.<br />
+  It is designed to work in conjunction with the Active Directory plugin, since it ties into the security realm currently set up.
+</div>
