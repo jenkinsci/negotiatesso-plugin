@@ -21,11 +21,12 @@ import hudson.Functions;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.IOException;
+import java.net.URL;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-//import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.acegisecurity.context.SecurityContextHolder;
 import waffle.servlet.NegotiateSecurityFilter;
@@ -40,6 +41,10 @@ import waffle.servlet.NegotiateSecurityFilter;
 public final class NegSecFilter extends NegotiateSecurityFilter {
 
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
+    public static final String BYPASS_HEADER = "Bypass_Kerberos";
+    private boolean redirectEnabled = false;
+    private String redirect = "yourdomain.com";
+    private boolean allowLocalhost = true;
     
     /**
      * Add call to advertise Jenkins headers, as appropriate.
@@ -52,6 +57,37 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
+        
+        if ((!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) || containsBypassHeader(request)) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        HttpServletRequest httpRequest = (HttpServletRequest)request;
+        String userContentPath = httpRequest.getContextPath() + "/userContent";
+        
+        if (httpRequest.getRequestURI().startsWith(userContentPath)) {
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (this.allowLocalhost && httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
+            // User is localhost, and we want to skip authenticating localhost
+            chain.doFilter(request, response);
+            return;
+        }
+        
+        if (this.redirectEnabled && !httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
+            // If local and remote addresses are identical, user is localhost and shouldn't be redirected
+            
+            String requestedURL = httpRequest.getRequestURL().toString();
+            String requestedDomain = new URL(requestedURL).getHost();
+            if (!requestedDomain.toLowerCase().contains(this.redirect.toLowerCase())) {
+                String redirectURL = requestedURL.replaceFirst(requestedDomain, requestedDomain + "." + this.redirect);
+                HttpServletResponse httpResponse = (HttpServletResponse)response;
+                httpResponse.sendRedirect(redirectURL);
+            }
+        }
         
         // A user is "always" authenticated by Jenkins as anonymous when not authenticated in any other way.
         if (SecurityContextHolder.getContext().getAuthentication() == null
@@ -68,5 +104,30 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         //}
         
         super.doFilter(request, response, chain); // This will also call the filter chaining
+    }
+    
+    private static boolean containsBypassHeader(ServletRequest request) {
+        if (!(request instanceof HttpServletRequest)) {
+            return false;
+        }
+        return ((HttpServletRequest)request).getHeader(BYPASS_HEADER) != null;
+    }
+    
+    /**
+     * @param doEnable if redirect should be enabled
+     * @param redirectTo the site to redirect to
+     */
+    public void setRedirect(boolean doEnable, String redirectTo)
+    {
+        this.redirectEnabled = doEnable;
+        this.redirect = redirectTo;
+    }
+    
+    /**
+     * @param allow if localhost should bypass the SSO authentication
+     */
+    public void setAllowLocalhost(boolean allow)
+    {
+        this.allowLocalhost = allow;
     }
 }

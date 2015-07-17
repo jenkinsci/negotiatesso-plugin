@@ -32,6 +32,10 @@ public final class NegotiateSSO extends GlobalConfiguration {
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
 
     private boolean enabled = false;
+    
+    private boolean redirectEnabled = false;
+    private String redirect = "yourdomain.com";
+    private boolean allowLocalhost = true;
 
     private boolean allowImpersonate = false;
     private String principalFormat = "fqn";
@@ -84,8 +88,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
         catch (ServletException e)
         {
-            LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
-            enabled = false;
+            this.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
+            this.enabled = false;
         }
     }
 
@@ -98,12 +102,12 @@ public final class NegotiateSSO extends GlobalConfiguration {
     public void start() throws ServletException {
         load();
         try {
-            if (enabled) {
+            if (this.enabled) {
                 startFilter();
             }
         } catch (ServletException e) {
-            LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
-            enabled = false;
+            this.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
+            this.enabled = false;
             removeFilter();
         }
     }
@@ -113,44 +117,50 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @throws ServletException 
      */
     private void startFilter() throws ServletException {
-        if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1)
+        if (!System.getProperty("os.name").toLowerCase().contains("win"))
         {
-            LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
-            enabled = false;
+            this.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
+            this.enabled = false;
             return;
         }
         
-        LOGGER.log(Level.INFO, "Starting Security Filter");
+        this.LOGGER.log(Level.INFO, "Starting Security Filter");
         this.filter = new NegSecFilter();
-        filter.setImpersonate(allowImpersonate);
-        filter.setAuth(authProvider);
-        filter.setPrincipalFormat(principalFormat); // default "fqn", options "fqn", "sid", "both"
-        filter.setRoleFormat(roleFormat); // default "fqn", options "fqn", "sid", "both", "none"
+        this.filter.setImpersonate(this.allowImpersonate);
+        this.filter.setAuth(this.authProvider);
+        this.filter.setPrincipalFormat(this.principalFormat); // default "fqn", options "fqn", "sid", "both"
+        this.filter.setRoleFormat(this.roleFormat); // default "fqn", options "fqn", "sid", "both", "none"
+        this.filter.setAllowLocalhost(this.allowLocalhost);
+        this.filter.setRedirect(this.redirectEnabled, this.redirect);
         SecurityFilterConfig config = new SecurityFilterConfig();
-        config.setParameter("roleFormat", roleFormat);
-        config.setParameter("principalFormat", principalFormat);
-        config.setParameter("impersonate", String.valueOf(allowImpersonate));
+        config.setParameter("roleFormat", this.roleFormat);
+        config.setParameter("principalFormat", this.principalFormat);
+        config.setParameter("impersonate", String.valueOf(this.allowImpersonate));
         config.setParameter("allowGuestLogin", String.valueOf(Boolean.FALSE));
-        config.setParameter("securityFilterProviders", providers); // split around any whitespace: \t\n\x0B\f\r
+        config.setParameter("securityFilterProviders", this.providers); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", NegotiateSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", BasicSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
-        config.setParameter("authProvider", authProvider.getClass().getName());
+        config.setParameter("authProvider", this.authProvider.getClass().getName());
         //config.setParameter("authProvider", WindowAuthForJenkins.class.getName());
-        if (providers.contains("NegotiateSecurityFilterProvider"))
+        
+        //config.setParameter("allowLocalhost", String.valueOf(this.allowLocalhost));
+        //config.setParameter("redirectEnabled", String.valueOf(this.redirectEnabled));
+        //config.setParameter("redirect", this.redirect);
+        if (this.providers.contains("NegotiateSecurityFilterProvider"))
         {
             //config.setParameter("waffle.servlet.spi.BasicSecurityFilterProvider/realm", "");
             //config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", "Negotiate NTLM"); // split around any whitespace: \t\n\x0B\f\r
             config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", protocols); // split around any whitespace: \t\n\x0B\f\r
         }
         
-        filter.init(config);
+        this.filter.init(config);
         
         // https://github.com/dblock/waffle/blob/master/Docs/tomcat/TomcatSingleSignOnValve.md
         //    fqn: Fully qualified names, such as domain\\username. When unavailable, a SID is used. This is the default.
         //    sid: SID in the S- format.
         //    both: Both a fully qualified name and a SID in the S- format. The fully qualified name is placed in the list first. Tomcat assumes that the first entry of this list is a username.
         //    none Do not include a principal name. Permitted only for roleFormat.
-        PluginServletFilter.addFilter(filter);
+        PluginServletFilter.addFilter(this.filter);
     }
 
     /**
@@ -159,10 +169,10 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @throws ServletException if PluginServletFilter does
      */
     private void removeFilter() throws ServletException {
-        if (filter != null) {
-            PluginServletFilter.removeFilter(filter);
-            filter.destroy();
-            filter = null;
+        if (this.filter != null) {
+            PluginServletFilter.removeFilter(this.filter);
+            this.filter.destroy();
+            this.filter = null;
         }
     }
 
@@ -184,43 +194,65 @@ public final class NegotiateSSO extends GlobalConfiguration {
             throws Descriptor.FormException {
         try {
             
-        if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1)
-        {
-            LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
-            removeFilter();
-            enabled = false;
-        }
-        else if (formData.has("enabled")) {
-
-            JSONObject data = (JSONObject) formData.get("enabled");
-
-            if (!data.has("allowImpersonate") || !data.has("roleFormat") || !data.has("principalFormat")) {
-                throw new Descriptor.FormException("Malformed form recieved. Try again.", "enabled");
-                //return false;
+            if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1)
+            {
+                this.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
+                removeFilter();
+                this.enabled = false;
             }
-
-            //Then processing data that it's up to the user to get correct.
-            this.enabled = true;
-
-            this.allowImpersonate = (Boolean) data.get("allowImpersonate");
-            this.roleFormat = (String) data.get("roleFormat");
-            this.principalFormat = (String) data.get("principalFormat");
-            this.protocols = (String) data.get("protocols");
-            this.providers = (String) data.get("providers");
-
-            removeFilter();
-            startFilter();
-
-        } else {
-            removeFilter();
-            enabled = false;
-        }
-
-        save();
+            else if (formData.has("enabled")) {
+            
+                JSONObject data = formData.getJSONObject("enabled");
+            
+                if (!data.has("allowImpersonate") || !data.has("roleFormat") 
+                        || !data.has("principalFormat") || !data.has("protocols") 
+                        || !data.has("providers") || !data.has("allowLocalhost")) {
+                    throw new Descriptor.FormException("Malformed form recieved. Try again.", "enabled");
+                }
+                
+                if (data.has("redirectEnabled")) {
+                    JSONObject rData = formData.getJSONObject("redirectEnabled");
+                    if (rData.has("redirect")) {
+                        String domain = rData.getString("redirect");
+                        if (!domain.isEmpty()) {
+                            this.redirectEnabled = true;
+                            this.redirect = rData.getString("redirect");
+                        }
+                        else {
+                            throw new Descriptor.FormException("Cannot specify empty domain. Try again.", "redirect");
+                        }
+                    }
+                    else {
+                        throw new Descriptor.FormException("Malformed form recieved. Try again.", "redirect");
+                    }
+                }
+                else {
+                    this.redirectEnabled = false;
+                }
+            
+                //Then processing data that it's up to the user to get correct.
+                this.enabled = true;
+            
+                this.allowImpersonate = data.getBoolean("allowImpersonate");
+                this.roleFormat = data.getString("roleFormat");
+                this.principalFormat = data.getString("principalFormat");
+                this.protocols = data.getString("protocols");
+                this.providers = data.getString("providers");
+                this.allowLocalhost = data.getBoolean("allowLocalhost");
+            
+                removeFilter();
+                startFilter();
+            
+            } else {
+                removeFilter();
+                this.enabled = false;
+            }
+            
+            save();
         }
         catch (ServletException e)
         {
-            LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
+            this.LOGGER.log(Level.SEVERE, "Failed to initialize plugin due to faulty config.", e);
             try {
                 removeFilter();
             }
@@ -228,7 +260,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
             {
                 // Nothing.
             }
-            enabled = false;
+            this.enabled = false;
             return false;
         }
         return true;
@@ -240,7 +272,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @return whether the Filter is currently enabled or not.
      */
     public boolean getEnabled() {
-        return enabled;
+        return this.enabled;
     }
 
     /**
@@ -249,7 +281,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @return the current role format
      */
     public String getRoleFormat() {
-        return roleFormat;
+        return this.roleFormat;
     }
 
     /**
@@ -267,7 +299,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @return the current principal format
      */
     public String getPrincipalFormat() {
-        return principalFormat;
+        return this.principalFormat;
     }
 
     /**
@@ -303,7 +335,43 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @return whether servlet delegation should be used.
      */
     public boolean isAllowImpersonate() {
-        return allowImpersonate;
+        return this.allowImpersonate;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
+     * @return whether localhost is allowed without authentication.
+     */
+    public boolean isAllowLocalhost() {
+        return this.allowLocalhost;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
+     * @return whether unauthenticated requests should be redirected
+     */
+    public boolean isRedirectEnabled() {
+        return this.redirectEnabled;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
+     * @return the site to redirect to
+     */
+    public String getRedirect() {
+        return this.redirect;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
+     * @param redirect the site to redirect to
+     */
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
     }
     
     /**

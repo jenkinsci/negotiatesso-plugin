@@ -28,6 +28,16 @@ form.section(title:"Windows Negotiate Single Sign-On") {
             form.entry(title:_("Allow Impersonate"), help:location+"/help-allow-impersonate.html") {
                 form.checkbox(field: "allowImpersonate")
             }
+                
+            form.entry(title:_("Allow Localhost"), help:location+"/help-allow-localhost.html") {
+                form.checkbox(field: "allowLocalhost")
+            }
+            
+            form.optionalBlock(title:_("DoRedirect"), help:location+"/help-redirect.html", field:"redirectEnabled") {
+                form.entry(title:_("RedirectTo"), field:"redirect") {
+                    form.textbox(field: "redirect")
+                }
+            }
         }
     }
 }
