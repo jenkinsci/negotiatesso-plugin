@@ -33,7 +33,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
 
     private boolean enabled = false;
 
-    private boolean allowImpersonate = true;
+    private boolean allowImpersonate = false;
     private String principalFormat = "fqn";
     private String roleFormat = "fqn";
     private String protocols = "Negotiate NTLM";

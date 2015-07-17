@@ -27,7 +27,7 @@ public class SecurityFilterConfig implements FilterConfig {
         allowedParams.put("principalFormat", Boolean.TRUE);
         allowedParams.put("roleFormat", Boolean.TRUE);
         allowedParams.put("allowGuestLogin", Boolean.TRUE);
-        allowedParams.put("impersonate", Boolean.TRUE);
+        allowedParams.put("impersonate", Boolean.FALSE);
         allowedParams.put("securityFilterProviders", Boolean.TRUE);
         allowedParams.put("authProvider", Boolean.TRUE);
         // waffle.servlet.spi.BasicSecurityFilterProvider/realm
