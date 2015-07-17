@@ -9,7 +9,21 @@
   <groupId>com.github.FarmGeek4Life.jenkins</groupId>
   <artifactId>NegotiateSSO</artifactId>
   <version>1.0-SNAPSHOT</version>
+  <name>Windows Negotiate SSO plugin</name>
   <packaging>hpi</packaging>
+  
+  <developers>
+      <developer>
+          <id>FarmGeek4Life</id>
+          <name>Bryson Gibbons</name>
+          <url>https://www.linkedin.com/in/brysongibbons</url>
+          <roles>
+              <role>architect</role>
+              <role>developer</role>
+          </roles>
+          <timezone>+8</timezone>
+      </developer>
+  </developers>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>
@@ -57,4 +71,10 @@
             <version>1.7.7</version>
         </dependency>
     </dependencies>
+    
+    <scm>
+        <connection>scm:git@github.com:FarmGeek4Life/NegotiateSSO.git</connection>
+        <developerConnection>scm:git@github.com:FarmGeek4Life/NegotiateSSO.git</developerConnection>
+        <url>https://github.com/FarmGeek4Life/NegotiateSSO</url>
+    </scm>
 </project>
