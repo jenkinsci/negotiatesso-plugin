@@ -1,6 +1,33 @@
+/*
+ *  The MIT License
+ *
+ *  Copyright (c) 2015 Bryson Gibbons. All rights reserved.
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ * 
+ *  Portions of this code are based on the KerberosSSO plugin, also licensed 
+ *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
+ *  for license details.
+ */
+
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
-//import waffle.servlet.NegotiateSecurityFilter;
 import hudson.Extension;
 import hudson.model.Descriptor;
 import hudson.util.ListBoxModel;
@@ -10,7 +37,6 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 import javax.servlet.ServletException;
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.GlobalConfiguration;
@@ -51,15 +77,16 @@ public final class NegotiateSSO extends GlobalConfiguration {
      *
      * @return the instance.
      */
-    /*public static NegotiateSSO getInstance() {
+    public static NegotiateSSO getInstance() {
         Jenkins jenkins = Jenkins.getInstance();
         if (jenkins != null) {
-            return jenkins.getPluginManager().getPlugin(NegotiateSSO.class);
+            return jenkins.getDescriptorByType(NegotiateSSO.class);
+            //return jenkins.getPluginManager().getPlugin(NegotiateSSO.class);
             //return jenkins.getPlugin(NegotiateSSO.class);
         } else {
             return null;
         }
-    }*/
+    }
     
     /**
      *
@@ -88,7 +115,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
         catch (ServletException e)
         {
-            this.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
+            NegotiateSSO.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
             this.enabled = false;
         }
     }
@@ -106,7 +133,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
                 startFilter();
             }
         } catch (ServletException e) {
-            this.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
+            NegotiateSSO.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
             this.enabled = false;
             removeFilter();
         }
@@ -119,12 +146,12 @@ public final class NegotiateSSO extends GlobalConfiguration {
     private void startFilter() throws ServletException {
         if (!System.getProperty("os.name").toLowerCase().contains("win"))
         {
-            this.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
+            NegotiateSSO.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
             this.enabled = false;
             return;
         }
         
-        this.LOGGER.log(Level.INFO, "Starting Security Filter");
+        NegotiateSSO.LOGGER.log(Level.INFO, "Starting Security Filter");
         this.filter = new NegSecFilter();
         this.filter.setImpersonate(this.allowImpersonate);
         this.filter.setAuth(this.authProvider);
@@ -186,17 +213,15 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @param formData the JSON data containing the new configuration.
      * @return 
      * @throws Descriptor.FormException if any data in the form is wrong.
-     * @throws IOException when adding and removing the filter.
-     * @throws ServletException when the filter is created faulty config.
      */
     @Override
     public boolean configure(StaplerRequest req, JSONObject formData)
             throws Descriptor.FormException {
         try {
             
-            if (System.getProperty("os.name").toLowerCase().indexOf("win") == -1)
+            if (!System.getProperty("os.name").toLowerCase().contains("win"))
             {
-                this.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
+                NegotiateSSO.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
                 removeFilter();
                 this.enabled = false;
             }
@@ -204,6 +229,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
             
                 JSONObject data = formData.getJSONObject("enabled");
             
+                //NegotiateSSO.LOGGER.log(Level.SEVERE, "data: " + data.toString());
                 if (!data.has("allowImpersonate") || !data.has("roleFormat") 
                         || !data.has("principalFormat") || !data.has("protocols") 
                         || !data.has("providers") || !data.has("allowLocalhost")) {
@@ -211,7 +237,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
                 }
                 
                 if (data.has("redirectEnabled")) {
-                    JSONObject rData = formData.getJSONObject("redirectEnabled");
+                    JSONObject rData = data.getJSONObject("redirectEnabled");
+                    //NegotiateSSO.LOGGER.log(Level.SEVERE, "rData: " + rData.toString());
                     if (rData.has("redirect")) {
                         String domain = rData.getString("redirect");
                         if (!domain.isEmpty()) {
@@ -252,7 +279,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
         catch (ServletException e)
         {
-            this.LOGGER.log(Level.SEVERE, "Failed to initialize plugin due to faulty config.", e);
+            NegotiateSSO.LOGGER.log(Level.SEVERE, "Failed to initialize plugin due to faulty config.", e);
             try {
                 removeFilter();
             }

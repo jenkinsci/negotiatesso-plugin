@@ -1,21 +1,40 @@
-/**
- * Waffle (https://github.com/dblock/waffle)
+/*
+ *  The MIT License
+ *
+ *  Copyright (c) 2015 Bryson Gibbons. All rights reserved.
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in
+ *  all copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
  * 
-* Copyright (c) 2010 - 2014 Application Security, Inc.
+ *  This class extends a Waffle class. See https://github.com/dblock/waffle for 
+ *  appropriate licenses for Waffle, which are not included here (as I do not 
+ *  include any source code from Waffle).
  * 
-* All rights reserved. This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License v1.0 which
- * accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
-* Contributors: Application Security, Inc. Modified by Bryson Gibbons for use
- * with Jenkins
+ *  Portions of this code are based on the KerberosSSO plugin, also licensed 
+ *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
+ *  for license details.
  */
+
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
 /**
  *
- * @author brysoncg
+ * @author Bryson Gibbons
  */
 import hudson.Functions;
 import java.util.logging.Level;
