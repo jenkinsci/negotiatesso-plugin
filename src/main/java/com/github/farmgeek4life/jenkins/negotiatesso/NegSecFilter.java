@@ -105,6 +105,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 String redirectURL = requestedURL.replaceFirst(requestedDomain, requestedDomain + "." + this.redirect);
                 HttpServletResponse httpResponse = (HttpServletResponse)response;
                 httpResponse.sendRedirect(redirectURL);
+                return;
             }
         }
         
