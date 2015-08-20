@@ -7,7 +7,7 @@
   </parent>
 
   <artifactId>NegotiateSSO</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>Windows Negotiate SSO plugin</name>
   <packaging>hpi</packaging>
   
@@ -77,5 +77,6 @@
         <connection>scm:git:ssh://github.com/jenkinsci/negotiate-sso-plugin.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiate-sso-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/negotiate-sso-plugin</url>
-    </scm>
+      <tag>NegotiateSSO-1.0</tag>
+  </scm>
 </project>
