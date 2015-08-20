@@ -6,7 +6,6 @@
     <version>1.580</version><!-- which version of Jenkins is this plugin built against? -->
   </parent>
 
-  <groupId>com.github.FarmGeek4Life.jenkins</groupId>
   <artifactId>NegotiateSSO</artifactId>
   <version>1.0-SNAPSHOT</version>
   <name>Windows Negotiate SSO plugin</name>
@@ -24,6 +23,8 @@
           <timezone>+8</timezone>
       </developer>
   </developers>
+  
+  <url>https://wiki.jenkins-ci.org/display/JENKINS/Negotiate+SSO+for+Windows</url>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>
@@ -73,8 +74,8 @@
     </dependencies>
     
     <scm>
-        <connection>scm:git@github.com:FarmGeek4Life/NegotiateSSO.git</connection>
-        <developerConnection>scm:git@github.com:FarmGeek4Life/NegotiateSSO.git</developerConnection>
-        <url>https://github.com/FarmGeek4Life/NegotiateSSO</url>
+        <connection>scm:git@github.com:jenkinsci/negotiate-sso-plugin.git</connection>
+        <developerConnection>scm:git@github.com:jenkinsci/negotiate-sso-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/negotiate-sso-plugin</url>
     </scm>
 </project>
