@@ -72,6 +72,13 @@ public class NegotiateConfigTests {
         webClient = rule.createWebClient();
         currentPage = webClient.goTo("configureSecurity");
     }
+    
+    /**
+     * 
+     */
+    private boolean IsWindowsOS() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
 
     /**
      * Tests if Negotiate SSO plugin has a section on the global config page.
@@ -118,6 +125,11 @@ public class NegotiateConfigTests {
         }
 
         boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
-        assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
+        if (IsWindowsOS()) {
+            assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
+        }
+        else {
+            assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
+        }
     }
 }
