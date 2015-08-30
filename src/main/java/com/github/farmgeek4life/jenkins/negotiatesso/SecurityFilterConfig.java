@@ -64,14 +64,7 @@ public class SecurityFilterConfig implements FilterConfig {
     public Boolean setParameter(String name, String value) {
         if (ALLOWED_PARAMS.containsKey(name))
         {
-            if (params.containsKey(name))
-            {
-                params.replace(name, value);
-            }
-            else
-            {
-                params.put(name, value);
-            }
+            params.put(name, value);
             return true;
         }
         return false;
