@@ -41,6 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.net.URL;
+import java.util.StringTokenizer;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -64,6 +65,8 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     private boolean redirectEnabled = false;
     private String redirect = "yourdomain.com";
     private boolean allowLocalhost = true;
+    private String pathsNotAuthenticated = "/userContent";
+    private String pathWildCardsNotAuthenticated = "/notifyCommit"; // "/git/notifyCommit;/subversion/*/notifyCommit"
     
     /**
      * Add call to advertise Jenkins headers, as appropriate.
@@ -83,11 +86,23 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         }
         
         HttpServletRequest httpRequest = (HttpServletRequest)request;
-        String userContentPath = httpRequest.getContextPath() + "/userContent";
+        String contextPath = httpRequest.getContextPath();
+        String requestURI = httpRequest.getRequestURI();
         
-        if (httpRequest.getRequestURI().startsWith(userContentPath)) {
-            chain.doFilter(request, response);
-            return;
+        StringTokenizer notAuthPathsTokenizer = new StringTokenizer(pathsNotAuthenticated, ";");
+        while (notAuthPathsTokenizer.hasMoreTokens()) {
+            if (requestURI.startsWith(contextPath + notAuthPathsTokenizer.nextToken())) {
+                chain.doFilter(request, response);
+                return;
+            }
+        }
+        
+        StringTokenizer notAuthPathWildCardsTokenizer = new StringTokenizer(pathWildCardsNotAuthenticated, ";");
+        while (notAuthPathWildCardsTokenizer.hasMoreTokens()) {
+            if (requestURI.contains(notAuthPathWildCardsTokenizer.nextToken())) {
+                chain.doFilter(request, response);
+                return;
+            }
         }
         
         if (this.allowLocalhost && httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
