@@ -52,7 +52,7 @@ import waffle.windows.auth.impl.WindowsAuthProviderImpl;
  *
  * @author Bryson Gibbons
  */
-public class WindowAuthForJenkins extends WindowsAuthProviderImpl {
+public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
     
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
     

@@ -68,7 +68,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     private String roleFormat = "fqn";
     private String protocols = "Negotiate NTLM";
     private String providers = NegotiateSecurityFilterProvider.class.getName() + " " + BasicSecurityFilterProvider.class.getName();
-    private transient final IWindowsAuthProvider authProvider = new WindowAuthForJenkins();
+    private transient final IWindowsAuthProvider authProvider = new WindowsAuthForJenkins();
 
     private transient NegSecFilter filter;
 
@@ -168,7 +168,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         //config.setParameter("securityFilterProviders", NegotiateSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", BasicSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
         config.setParameter("authProvider", this.authProvider.getClass().getName());
-        //config.setParameter("authProvider", WindowAuthForJenkins.class.getName());
+        //config.setParameter("authProvider", WindowsAuthForJenkins.class.getName());
         
         //config.setParameter("allowLocalhost", String.valueOf(this.allowLocalhost));
         //config.setParameter("redirectEnabled", String.valueOf(this.redirectEnabled));
