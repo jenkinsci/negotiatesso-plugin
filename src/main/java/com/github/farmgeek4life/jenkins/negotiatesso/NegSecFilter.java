@@ -65,8 +65,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     private boolean redirectEnabled = false;
     private String redirect = "yourdomain.com";
     private boolean allowLocalhost = true;
-    private String pathsNotAuthenticated = "/userContent";
-    private String pathWildCardsNotAuthenticated = "/notifyCommit"; // "/git/notifyCommit;/subversion/*/notifyCommit"
+    private final String pathsNotAuthenticated = "userContent;cli;git;jnlpJars;subversion;whoAmI;bitbucket-hook;";
     
     /**
      * Add call to advertise Jenkins headers, as appropriate.
@@ -91,15 +90,13 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         StringTokenizer notAuthPathsTokenizer = new StringTokenizer(pathsNotAuthenticated, ";");
         while (notAuthPathsTokenizer.hasMoreTokens()) {
-            if (requestURI.startsWith(contextPath + notAuthPathsTokenizer.nextToken())) {
-                chain.doFilter(request, response);
-                return;
+            String token = notAuthPathsTokenizer.nextToken();
+            if (token.length() < 1) {
+                continue;
             }
-        }
-        
-        StringTokenizer notAuthPathWildCardsTokenizer = new StringTokenizer(pathWildCardsNotAuthenticated, ";");
-        while (notAuthPathWildCardsTokenizer.hasMoreTokens()) {
-            if (requestURI.contains(notAuthPathWildCardsTokenizer.nextToken())) {
+            
+            String matchString = contextPath + "/" + token;
+            if (requestURI.equals(matchString) || requestURI.startsWith(matchString + "/")) {
                 chain.doFilter(request, response);
                 return;
             }
