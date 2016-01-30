@@ -74,9 +74,9 @@
     </dependencies>
     
     <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/negotiate-sso-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiate-sso-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/negotiate-sso-plugin</url>
+        <connection>scm:git:ssh://github.com/jenkinsci/negotiatesso-plugin.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiatesso-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/negotiatesso-plugin</url>
       <tag>HEAD</tag>
   </scm>
 </project>
