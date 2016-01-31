@@ -69,11 +69,11 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     
     /**
      * Add call to advertise Jenkins headers, as appropriate.
-     * @param request
-     * @param response
-     * @param chain
-     * @throws java.io.IOException
-     * @throws javax.servlet.ServletException
+     * @param request The request - used to check for not authorized paths, check for localhost, redirect, and chain filters
+     * @param response The response - used to redirect, advertise headers, or chain filters
+     * @param chain The filter chain
+     * @throws java.io.IOException pass-through from request/response/chain
+     * @throws javax.servlet.ServletException pass-through from request/response/chain
      */
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)

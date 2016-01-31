@@ -89,8 +89,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
     }
     
     /**
-     *
-     * @return
+     * Get the proper category for the settings location
+     * @return GlobalConfigurationCategory.Security
      */
     @Override
     public GlobalConfigurationCategory getCategory() {
@@ -98,8 +98,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
     }
     
     /**
-     *
-     * @return
+     * The Plugin Display name
+     * @return Display name
      */
     @Override
     public String getDisplayName() {
@@ -140,7 +140,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     }
     
     /**
-     * 
+     * Initializes the filter and inserts it into the chain
      * @throws ServletException 
      */
     private void startFilter() throws ServletException {
@@ -211,7 +211,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      *
      * @param req the Stapler Request to serve.
      * @param formData the JSON data containing the new configuration.
-     * @return 
+     * @return true if configuration successful; false otherwise
      * @throws Descriptor.FormException if any data in the form is wrong.
      */
     @Override

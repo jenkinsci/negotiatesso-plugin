@@ -1,3 +1,4 @@
+<?jelly escape-by-default='true'?>
 <div>
   Enables Single Sign-On with NTLM or Kerberos using Waffle (https://github.com/dblock/waffle).<br />
   It uses a negotiate filter, and will fall back to a basic filter if negotiate fails.<br />

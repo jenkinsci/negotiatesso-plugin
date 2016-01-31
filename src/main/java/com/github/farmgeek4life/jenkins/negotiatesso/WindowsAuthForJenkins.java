@@ -88,13 +88,18 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
         if (principalName.contains("\\")) {
             principalName = principalName.substring(principalName.indexOf("\\") + 1);
         }
-        SecurityRealm realm = Jenkins.getInstance().getSecurityRealm();
+        Jenkins jenkins = Jenkins.getInstance();
+        if (jenkins == null) {
+            return;
+        }
+        SecurityRealm realm = jenkins.getSecurityRealm();
         UserDetails userDetails = realm.loadUserByUsername(principalName);
         Authentication authToken = new UsernamePasswordAuthenticationToken(
                         userDetails.getUsername(),
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
-        SecurityContext context = ACL.impersonate(authToken);
+        //SecurityContext context = ACL.impersonate(authToken); // Findbugs Dead local store
+        ACL.impersonate(authToken);
         if (Jenkins.getVersion().isNewerThan(new VersionNumber("1.568"))) {
             try {
                 Method fireLoggedIn = SecurityListener.class.getMethod("fireLoggedIn", String.class);

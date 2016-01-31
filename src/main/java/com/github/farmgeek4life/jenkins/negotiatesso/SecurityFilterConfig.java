@@ -87,12 +87,12 @@ public class SecurityFilterConfig implements FilterConfig {
 
     @Override
     public Enumeration getInitParameterNames() {
-        String tokenizer = new String();
+        StringBuffer tokenizer = new StringBuffer();
         for (String param : params.keySet())
         {
-            tokenizer += param + ";";
+            tokenizer.append(param + ";");
         }
-        return new StringTokenizer(tokenizer, ";");
+        return new StringTokenizer(tokenizer.toString(), ";");
     }
     
 }

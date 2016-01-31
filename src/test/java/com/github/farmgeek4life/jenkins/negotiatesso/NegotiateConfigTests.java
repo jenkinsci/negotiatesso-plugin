@@ -118,7 +118,7 @@ public class NegotiateConfigTests {
         try {
             ArrayList<HtmlElement> elements = (ArrayList<HtmlElement>)form.getHtmlElementsByTagName("button");
             HtmlButton button = (HtmlButton)elements.get(elements.size() - 1);
-            form.submit(button);
+            button.click();
             // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
         } catch (FailingHttpStatusCodeException e) {
             // Expected since filter cannot be added to Jenkins rule.
