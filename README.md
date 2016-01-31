@@ -1,5 +1,7 @@
 ## NegotiateSSO
 
+[![Build Status](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/badge/icon)](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/)
+
 A SSO plugin for Jenkins 1.580 and above, running on Windows in a domain environment, using only the built-in Jetty web server.
 
 # Requirements:
@@ -11,9 +13,11 @@ A SSO plugin for Jenkins 1.580 and above, running on Windows in a domain environ
 * Clients accessing Jenkins must be on the same domain (Not tested in a cross-domain environment)
 * Access to Jenkins using a web browser on the hosting system is recommended during initial configuration (as is leaving "Allow Localhost" checked until it all works)
 
+NOTE: if "Specify custom Active Directory domain name" is used with the Active Directory plugin, then the "Bind DN" under the "Advanced" settings for the Active Directory plugin must be set correctly.
+
 For this plugin to work, Jenkins needs to be running as a service that has permission to perform kerberos authentication, and the system needs to have a domain configuration that allows kerberos authentication. See https://github.com/dblock/waffle/blob/master/Docs/Troubleshooting.md for some tips on this.
 
-My testing configuration has Jenkins running as Local System, with HTTP/hostname and HTTP/hostname.domain SPNs.
+My testing configuration has Jenkins running as hostname\Network Service, with HTTP/hostname and HTTP/hostname.domain SPNs. (NOTE: Previously used hostname\Local System, but changed it to hostname\Network Service for security purposes. Doing so originally broke the jenkins restart, until I edited permissions on the jenkins service using the [Service Security Editor tool] (http://www.coretechnologies.com/products/ServiceSecurityEditor/) to allow Network Service to start/stop/restart the jenkins service.)
 
 This uses the Waffle security classes to operate the single sign on, and relies the permissions settings of the Active Directory plugin for user permissions.
 
