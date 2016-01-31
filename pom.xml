@@ -6,24 +6,29 @@
     <version>1.586</version><!-- which version of Jenkins is this plugin built against? -->
   </parent>
 
+  <properties>
+    <!-- waffle-jna 1.8.0 has dependencies on Java 7; minimum Jenkins version must be 1.612 -->
+    <waffle.version>1.7.5</waffle.version>
+  </properties>
+
   <artifactId>NegotiateSSO</artifactId>
   <version>1.1-SNAPSHOT</version>
   <name>Windows Negotiate SSO plugin</name>
   <packaging>hpi</packaging>
-  
+
   <developers>
-      <developer>
-          <id>FarmGeek4Life</id>
-          <name>Bryson Gibbons</name>
-          <url>https://www.linkedin.com/in/brysongibbons</url>
-          <roles>
-              <role>architect</role>
-              <role>developer</role>
-          </roles>
-          <timezone>+8</timezone>
-      </developer>
+    <developer>
+      <id>FarmGeek4Life</id>
+      <name>Bryson Gibbons</name>
+      <url>https://www.linkedin.com/in/brysongibbons</url>
+      <roles>
+        <role>architect</role>
+        <role>developer</role>
+      </roles>
+      <timezone>+8</timezone>
+    </developer>
   </developers>
-  
+
   <url>https://wiki.jenkins-ci.org/display/JENKINS/Negotiate+SSO+for+Windows</url>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
@@ -40,43 +45,18 @@
       <url>http://repo.jenkins-ci.org/public/</url>
     </pluginRepository>
   </pluginRepositories>
-    <dependencies>
-        <dependency>
-            <groupId>com.github.dblock.waffle</groupId>
-            <artifactId>waffle-jna</artifactId>
-            <version>1.7.4</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna-platform</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>18.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-jdk14</artifactId>
-            <version>1.7.7</version>
-        </dependency>
-    </dependencies>
-    
-    <scm>
-        <connection>scm:git:ssh://github.com/jenkinsci/negotiatesso-plugin.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiatesso-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/negotiatesso-plugin</url>
-      <tag>HEAD</tag>
+  <dependencies>
+    <dependency>
+      <groupId>com.github.dblock.waffle</groupId>
+      <artifactId>waffle-jna</artifactId>
+      <version>${waffle.version}</version>
+    </dependency>
+  </dependencies>
+
+  <scm>
+    <connection>scm:git:ssh://github.com/jenkinsci/negotiatesso-plugin.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiatesso-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/negotiatesso-plugin</url>
+    <tag>HEAD</tag>
   </scm>
 </project>

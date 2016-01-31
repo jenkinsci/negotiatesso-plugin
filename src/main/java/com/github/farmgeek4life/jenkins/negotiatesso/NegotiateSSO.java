@@ -54,7 +54,6 @@ import waffle.windows.auth.IWindowsAuthProvider;
  */
 @Extension
 public final class NegotiateSSO extends GlobalConfiguration {
-
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
 
     private boolean enabled = false;
@@ -106,15 +105,16 @@ public final class NegotiateSSO extends GlobalConfiguration {
         return "NegotiateSSO";
     }
     
-    public NegotiateSSO()
-    {
+    /**
+     * Initializes and starts the filter, if enabled.
+     */
+    public NegotiateSSO() {
         super();
         //load(); // start() calls load().
         try {
             start();
         }
-        catch (ServletException e)
-        {
+        catch (ServletException e) {
             NegotiateSSO.LOGGER.log(Level.SEVERE, "Failed initialize plugin due to faulty config.", e);
             this.enabled = false;
         }
@@ -144,8 +144,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @throws ServletException 
      */
     private void startFilter() throws ServletException {
-        if (!System.getProperty("os.name").toLowerCase().contains("win"))
-        {
+        if (!System.getProperty("os.name").toLowerCase().contains("win")) {
             NegotiateSSO.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
             this.enabled = false;
             return;
@@ -173,8 +172,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         //config.setParameter("allowLocalhost", String.valueOf(this.allowLocalhost));
         //config.setParameter("redirectEnabled", String.valueOf(this.redirectEnabled));
         //config.setParameter("redirect", this.redirect);
-        if (this.providers.contains("NegotiateSecurityFilterProvider"))
-        {
+        if (this.providers.contains("NegotiateSecurityFilterProvider")) {
             //config.setParameter("waffle.servlet.spi.BasicSecurityFilterProvider/realm", "");
             //config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", "Negotiate NTLM"); // split around any whitespace: \t\n\x0B\f\r
             config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", protocols); // split around any whitespace: \t\n\x0B\f\r
@@ -218,15 +216,12 @@ public final class NegotiateSSO extends GlobalConfiguration {
     public boolean configure(StaplerRequest req, JSONObject formData)
             throws Descriptor.FormException {
         try {
-            
-            if (!System.getProperty("os.name").toLowerCase().contains("win"))
-            {
+            if (!System.getProperty("os.name").toLowerCase().contains("win")) {
                 NegotiateSSO.LOGGER.log(Level.SEVERE, "Not a Windows OS. NegotiateSSO will not work. Plugin Disabled.");
                 removeFilter();
                 this.enabled = false;
             }
             else if (formData.has("enabled")) {
-            
                 JSONObject data = formData.getJSONObject("enabled");
             
                 //NegotiateSSO.LOGGER.log(Level.SEVERE, "data: " + data.toString());
@@ -269,7 +264,6 @@ public final class NegotiateSSO extends GlobalConfiguration {
             
                 removeFilter();
                 startFilter();
-            
             } else {
                 removeFilter();
                 this.enabled = false;
@@ -277,14 +271,12 @@ public final class NegotiateSSO extends GlobalConfiguration {
             
             save();
         }
-        catch (ServletException e)
-        {
+        catch (ServletException e) {
             NegotiateSSO.LOGGER.log(Level.SEVERE, "Failed to initialize plugin due to faulty config.", e);
             try {
                 removeFilter();
             }
-            catch (ServletException x)
-            {
+            catch (ServletException x) {
                 // Nothing.
             }
             this.enabled = false;

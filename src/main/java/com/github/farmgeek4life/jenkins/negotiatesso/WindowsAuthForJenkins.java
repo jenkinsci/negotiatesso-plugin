@@ -41,7 +41,6 @@ import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import jenkins.security.SecurityListener;
 import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContext;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
 import waffle.windows.auth.IWindowsIdentity;
@@ -49,19 +48,20 @@ import waffle.windows.auth.IWindowsSecurityContext;
 import waffle.windows.auth.impl.WindowsAuthProviderImpl;
 
 /**
- *
+ * Subclassed authentication implementation to integrate with Jenkins authentication
  * @author Bryson Gibbons
  */
 public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
-    
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
     
     /**
      * Called by BasicSecurityFilterProvider
+     * @param username username from basic security filter
+     * @param password password from basic security filter
+     * @return user identity
      */
     @Override
-    public IWindowsIdentity logonUser(final String username, final String password)
-    {
+    public IWindowsIdentity logonUser(final String username, final String password) {
        IWindowsIdentity id = super.logonUser(username, password);
        authenticateJenkins(id);
        return id;
@@ -69,6 +69,10 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
     
     /**
      * Called by NegotiateSecurityFilterProvider
+     * @param connectionId unique connection id
+     * @param token client's security token
+     * @param securityPackage security package - Negotiate, kerberos, or NTLM
+     * @return authentication context
      */
     @Override
     public IWindowsSecurityContext acceptSecurityToken(final String connectionId, final byte[] token, final String securityPackage) {
@@ -98,7 +102,6 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
                         userDetails.getUsername(),
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
-        //SecurityContext context = ACL.impersonate(authToken); // Findbugs Dead local store
         ACL.impersonate(authToken);
         if (Jenkins.getVersion().isNewerThan(new VersionNumber("1.568"))) {
             try {

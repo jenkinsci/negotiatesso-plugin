@@ -37,7 +37,6 @@ import javax.servlet.ServletContext;
  * @author Bryson Gibbons
  */
 public class SecurityFilterConfig implements FilterConfig {
-    
     private final HashMap<String, String> params = new HashMap<String, String>();
     public static final Map<String, Boolean> ALLOWED_PARAMS;
     
@@ -62,35 +61,50 @@ public class SecurityFilterConfig implements FilterConfig {
     }
     
     public Boolean setParameter(String name, String value) {
-        if (ALLOWED_PARAMS.containsKey(name))
-        {
+        if (ALLOWED_PARAMS.containsKey(name)) {
             params.put(name, value);
             return true;
         }
         return false;
     }
     
+    /**
+     * Filter name
+     * @return The name of the filter
+     */
     @Override
     public String getFilterName() {
         return "NegSecFilter";
     }
     
+    /**
+     * Servlet context
+     * @return servlet context
+     */
     @Override
     public ServletContext getServletContext() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    /**
+     * Get the value for a parameter
+     * @param string parameter name
+     * @return parameter value
+     */
     @Override
     public String getInitParameter(String string) {
         return params.get(string);
     }
 
+    /**
+     * Get an enumeration of parameter names
+     * @return Enumeration of parameter names
+     */
     @Override
     public Enumeration getInitParameterNames() {
-        StringBuffer tokenizer = new StringBuffer();
-        for (String param : params.keySet())
-        {
-            tokenizer.append(param + ";");
+        StringBuilder tokenizer = new StringBuilder();
+        for (String param : params.keySet()) {
+            tokenizer.append(param).append(";");
         }
         return new StringTokenizer(tokenizer.toString(), ";");
     }

@@ -2,7 +2,7 @@
 
 [![Build Status](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/badge/icon)](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/)
 
-A SSO plugin for Jenkins 1.580 and above, running on Windows in a domain environment, using only the built-in Jetty web server.
+A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environment, using only the built-in Jetty web server.
 
 # Requirements:
 * Jenkins is running as a service

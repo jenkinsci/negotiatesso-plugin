@@ -59,7 +59,6 @@ import waffle.servlet.NegotiateSecurityFilter;
  * Also, add an ability to configure the FilterProviders to use, outside of init(FilterConfig)
  */
 public final class NegSecFilter extends NegotiateSecurityFilter {
-
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
     public static final String BYPASS_HEADER = "Bypass_Kerberos";
     private boolean redirectEnabled = false;
@@ -78,7 +77,6 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
             throws IOException, ServletException {
-        
         if ((!(request instanceof HttpServletRequest) || !(response instanceof HttpServletResponse)) || containsBypassHeader(request)) {
             chain.doFilter(request, response);
             return;
@@ -110,7 +108,6 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         if (this.redirectEnabled && !httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
             // If local and remote addresses are identical, user is localhost and shouldn't be redirected
-            
             String requestedURL = httpRequest.getRequestURL().toString();
             String requestedDomain = new URL(requestedURL).getHost();
             if (!requestedDomain.toLowerCase().contains(this.redirect.toLowerCase())) {
@@ -149,8 +146,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
      * @param doEnable if redirect should be enabled
      * @param redirectTo the site to redirect to
      */
-    public void setRedirect(boolean doEnable, String redirectTo)
-    {
+    public void setRedirect(boolean doEnable, String redirectTo) {
         this.redirectEnabled = doEnable;
         this.redirect = redirectTo;
     }
@@ -158,8 +154,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     /**
      * @param allow if localhost should bypass the SSO authentication
      */
-    public void setAllowLocalhost(boolean allow)
-    {
+    public void setAllowLocalhost(boolean allow) {
         this.allowLocalhost = allow;
     }
 }
