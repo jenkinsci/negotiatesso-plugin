@@ -8,7 +8,7 @@ A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environ
 * Jenkins is running as a service
 * Jenkins is on a Windows system
 * Jenkins is authenticating using the Active Directory plugin
-* Service account that Jenkins uses must have kerberos authentication privileges on the domain
+* Service account that Jenkins uses must have kerberos authentication privileges on the domain ([see SPN information here](http://blogs.iis.net/brian-murphy-booth/the-biggest-mistake-serviceprincipalname-s))
 * Windows system account (on the domain) must be configured to allow kerberos authentication (HTTP SPNs)
 * Clients accessing Jenkins must be on the same domain (Not tested in a cross-domain environment)
 * Access to Jenkins using a web browser on the hosting system is recommended during initial configuration (as is leaving "Allow Localhost" checked until it all works)
