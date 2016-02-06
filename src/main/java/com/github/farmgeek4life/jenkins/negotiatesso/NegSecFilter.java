@@ -41,7 +41,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.net.URL;
-import java.util.StringTokenizer;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -49,6 +48,11 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.acegisecurity.context.SecurityContextHolder;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableSet;
+import jenkins.model.Jenkins;
+
 import waffle.servlet.NegotiateSecurityFilter;
 //import waffle.servlet.spi.SecurityFilterProviderCollection;
 //import waffle.servlet.spi.BasicSecurityFilterProvider;
@@ -64,8 +68,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     private boolean redirectEnabled = false;
     private String redirect = "yourdomain.com";
     private boolean allowLocalhost = true;
-    private final String pathsNotAuthenticated = "userContent;cli;git;jnlpJars;subversion;whoAmI;bitbucket-hook;";
-    
+
     /**
      * Add call to advertise Jenkins headers, as appropriate.
      * @param request The request - used to check for not authorized paths, check for localhost, redirect, and chain filters
@@ -83,21 +86,12 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         }
         
         HttpServletRequest httpRequest = (HttpServletRequest)request;
-        String contextPath = httpRequest.getContextPath();
-        String requestURI = httpRequest.getRequestURI();
-        
-        StringTokenizer notAuthPathsTokenizer = new StringTokenizer(pathsNotAuthenticated, ";");
-        while (notAuthPathsTokenizer.hasMoreTokens()) {
-            String token = notAuthPathsTokenizer.nextToken();
-            if (token.length() < 1) {
-                continue;
-            }
-            
-            String matchString = contextPath + "/" + token;
-            if (requestURI.equals(matchString) || requestURI.startsWith(matchString + "/")) {
-                chain.doFilter(request, response);
-                return;
-            }
+        String requestUri = httpRequest.getRequestURI();
+        LOGGER.log(Level.FINEST, "Request URI: " + requestUri);
+        if (!shouldAttemptAuthentication(Jenkins.getInstance(), httpRequest, requestUri)) {
+			LOGGER.log(Level.FINER, "Bypassing authentication for " + requestUri);
+            chain.doFilter(request, response);
+            return;
         }
         
         if (this.allowLocalhost && httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
@@ -135,7 +129,90 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         super.doFilter(request, response, chain); // This will also call the filter chaining
     }
     
-    private static boolean containsBypassHeader(ServletRequest request) {
+    /**
+     * Copied from Jenkins.ALWAYS_READABLE_PATHS. Should request a public access to it, or a split function.
+     * Urls that are always visible without READ permission.
+     *
+     * <p>See also:{@link #getUnprotectedRootActions}.
+     */
+    private static final ImmutableSet<String> ALWAYS_READABLE_PATHS = ImmutableSet.of(
+        "/login",
+        "/logout",
+        "/accessDenied",
+        "/adjuncts/",
+        "/error",
+        "/oops",
+        "/signup",
+        "/tcpSlaveAgentListener",
+        "/federatedLoginService/",
+        "/securityRealm",
+        "/userContent" // not added in Jenkins.java, but obviously needed in this case...
+    );
+    
+    /**
+     * Remove the hostname and the query string from a requested URI
+     * @param requestURI the requested URI
+     * @return the cleaned portion of the URI
+     */
+    @VisibleForTesting
+    static String cleanRequest(String requestURI) {
+        // if the request URI starts with http, delete everything up to the first '/' following the hostname
+        // if the request URI has a query string, delete it.
+        return requestURI.replaceAll("^https?://[^/]+/", "/").replaceAll("\\?.*$", "");
+    }
+    
+    /**
+     * Check a request URI to see if authentication should be attempted
+     * 
+     * If a path is unprotected or always readable, don't attempt to authenticate.
+     * Attempting to authenticate causes problems with things like the cli and notifyCommit URIs
+     * @param jenkins jenkins instance; accessible for testing purposes (for getUnprotectedRootActions())
+     * @param request servlet request, used to get the parameter "encrypt"
+     * @param requestURI the requested URI
+     * @return true if authenticated should be attempted.
+     */
+    @VisibleForTesting
+    static boolean shouldAttemptAuthentication(Jenkins jenkins, ServletRequest request, String requestURI) {
+        // NOTES:
+        // Jenkins has private set ALWAYS_READABLE_PATHS, getUnprotectedRootAction(), and another
+        // test that are exceptions to the permissions check. jenkins.getTarget() runs all of these,
+        // but we only care about the exceptions to the permissions check.
+        // Trying to use jenkins.getTarget() always seemed to test against anonymous or everyone permissions,
+        // so the user was never automatically authenticated.
+        
+        // Code copied from Jenkins.getTarget(); need the rest, but not the permission check.
+        String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
+        for (String name : ALWAYS_READABLE_PATHS) {
+            if (rest.startsWith(name)) {
+                LOGGER.log(Level.FINER, "NoAuthRequired: Always readable path: " + rest);
+                return false;
+            }
+        }
+        
+        // uses Stapler.getCurrentRequest().getParameter("encrypt") in Jenkins.getTarget()
+        if (rest.matches("/computer/[^/]+/slave-agent[.]jnlp") 
+                && "true".equals(request.getParameter("encrypt"))) {
+                LOGGER.log(Level.FINER, "NoAuthRequired: Slave agent jnlp: " + rest);
+            return false;
+        }
+        
+        // remaining checks require access to jenkins 
+        // if no access to jenkins, assume authentication should be attempted
+        if (jenkins == null) {
+            return true;
+        }
+        
+        for (String name : jenkins.getUnprotectedRootActions()) {
+            if (rest.startsWith("/" + name + "/") || rest.equals("/" + name)) {
+                LOGGER.log(Level.FINER, "NoAuthRequired: Unprotected root action: " + rest);
+                return false;
+            }
+        }
+
+    	return true;
+	}
+    
+	private static boolean containsBypassHeader(ServletRequest request) {
         if (!(request instanceof HttpServletRequest)) {
             return false;
         }

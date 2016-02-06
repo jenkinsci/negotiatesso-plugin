@@ -48,7 +48,6 @@ import static org.junit.Assert.assertTrue;
  * @author Bryson Gibbons
  */
 public class NegotiateConfigTests {
-    
     /**
      * Time limit in seconds for timed tests.
      */
