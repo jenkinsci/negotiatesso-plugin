@@ -88,6 +88,8 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         String requestUri = httpRequest.getRequestURI();
         LOGGER.log(Level.FINEST, "Request URI: " + requestUri);
+        // After Jenkins 1.590:
+        //Jenkins jenkins = Jenkins.getActiveInstance();
         if (!shouldAttemptAuthentication(Jenkins.getInstance(), httpRequest, requestUri)) {
 			LOGGER.log(Level.FINER, "Bypassing authentication for " + requestUri);
             chain.doFilter(request, response);
