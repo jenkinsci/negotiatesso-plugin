@@ -335,10 +335,28 @@ public final class NegotiateSSO extends GlobalConfiguration {
     /**
      * Used by groovy for data-binding.
      *
+     * @return the current protocols
+     */
+    public String getProtocols() {
+        return protocols;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
      * @param protocol set the principal format
      */
     public void setProtocols(String protocol) {
         this.protocols = protocol;
+    }
+
+    /**
+     * Used by groovy for data-binding.
+     *
+     * @return the current providers
+     */
+    public String getProviders() {
+        return providers;
     }
 
     /**
