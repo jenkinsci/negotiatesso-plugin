@@ -119,16 +119,16 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
                 || Functions.isAnonymous()) {
             Functions.advertiseHeaders((HttpServletResponse)response); //Adds headers for CLI
-        //    logger.log(Level.FINE, "Filtering request");
-        //    super.doFilter(request, response, chain);
+            LOGGER.log(Level.FINE, "Filtering request");
+            super.doFilter(request, response, chain); // Calls the authentication filter, which chains
         }
-        //else
-        //{
-        //    logger.log(Level.FINE, "Bypassing filter - already authenticated");
-        //    chain.doFilter(request, response);
-        //}
+        else
+        {
+            LOGGER.log(Level.FINE, "Bypassing filter - already authenticated");
+            chain.doFilter(request, response); // just continue down the filter chain
+        }
         
-        super.doFilter(request, response, chain); // This will also call the filter chaining
+        //super.doFilter(request, response, chain); // This will also call the filter chaining
     }
     
     /**
