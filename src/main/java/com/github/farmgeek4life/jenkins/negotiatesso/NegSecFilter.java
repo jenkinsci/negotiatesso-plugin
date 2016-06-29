@@ -124,7 +124,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         }
         else
         {
-            LOGGER.log(Level.FINE, "Bypassing filter - already authenticated: " + requestUri);
+            LOGGER.log(Level.FINER, "Bypassing filter - already authenticated: " + requestUri);
             chain.doFilter(request, response); // just continue down the filter chain
         }
         
@@ -186,7 +186,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
         for (String name : ALWAYS_READABLE_PATHS) {
             if (rest.startsWith(name)) {
-                LOGGER.log(Level.FINER, "NoAuthRequired: Always readable path: " + rest);
+                LOGGER.log(Level.FINEST, "NoAuthRequired: Always readable path: " + rest);
                 return false;
             }
         }
@@ -194,7 +194,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // uses Stapler.getCurrentRequest().getParameter("encrypt") in Jenkins.getTarget()
         if (rest.matches("/computer/[^/]+/slave-agent[.]jnlp") 
                 && "true".equals(request.getParameter("encrypt"))) {
-                LOGGER.log(Level.FINER, "NoAuthRequired: Slave agent jnlp: " + rest);
+                LOGGER.log(Level.FINEST, "NoAuthRequired: Slave agent jnlp: " + rest);
             return false;
         }
         
@@ -206,7 +206,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         for (String name : jenkins.getUnprotectedRootActions()) {
             if (rest.startsWith("/" + name + "/") || rest.equals("/" + name)) {
-                LOGGER.log(Level.FINER, "NoAuthRequired: Unprotected root action: " + rest);
+                LOGGER.log(Level.FINEST, "NoAuthRequired: Unprotected root action: " + rest);
                 return false;
             }
         }
