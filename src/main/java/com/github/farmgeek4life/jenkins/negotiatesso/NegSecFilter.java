@@ -91,7 +91,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // After Jenkins 1.590:
         //Jenkins jenkins = Jenkins.getActiveInstance();
         if (!shouldAttemptAuthentication(Jenkins.getInstance(), httpRequest, requestUri)) {
-			LOGGER.log(Level.FINER, "Bypassing authentication for " + requestUri);
+            LOGGER.log(Level.FINER, "Bypassing authentication for " + requestUri);
             chain.doFilter(request, response);
             return;
         }
@@ -119,12 +119,12 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
                 || Functions.isAnonymous()) {
             Functions.advertiseHeaders((HttpServletResponse)response); //Adds headers for CLI
-            LOGGER.log(Level.FINE, "Filtering request");
+            LOGGER.log(Level.FINE, "Filtering request: " + requestUri);
             super.doFilter(request, response, chain); // Calls the authentication filter, which chains
         }
         else
         {
-            LOGGER.log(Level.FINE, "Bypassing filter - already authenticated");
+            LOGGER.log(Level.FINE, "Bypassing filter - already authenticated: " + requestUri);
             chain.doFilter(request, response); // just continue down the filter chain
         }
         
@@ -211,10 +211,10 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
             }
         }
 
-    	return true;
-	}
+        return true;
+    }
     
-	private static boolean containsBypassHeader(ServletRequest request) {
+    private static boolean containsBypassHeader(ServletRequest request) {
         if (!(request instanceof HttpServletRequest)) {
             return false;
         }
