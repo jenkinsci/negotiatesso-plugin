@@ -104,12 +104,20 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         if (this.redirectEnabled && !httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
             // If local and remote addresses are identical, user is localhost and shouldn't be redirected
-            String requestedURL = httpRequest.getRequestURL().toString();
-            String requestedDomain = new URL(requestedURL).getHost();
-            if (!requestedDomain.toLowerCase().contains(this.redirect.toLowerCase())) {
-                String redirectURL = requestedURL.replaceFirst(requestedDomain, requestedDomain + "." + this.redirect);
+            try {
+                String requestedURL = httpRequest.getRequestURL().toString();
+                String requestedDomain = new URL(requestedURL).getHost();
+                if (!requestedDomain.toLowerCase().contains(this.redirect.toLowerCase())) {
+                    String redirectURL = requestedURL.replaceFirst(requestedDomain, requestedDomain + "." + this.redirect);
+                    HttpServletResponse httpResponse = (HttpServletResponse)response;
+                    httpResponse.sendRedirect(redirectURL);
+                    return;
+                }
+            }
+            catch (java.net.MalformedURLException e) {
                 HttpServletResponse httpResponse = (HttpServletResponse)response;
-                httpResponse.sendRedirect(redirectURL);
+                httpResponse.sendError(404, "ERROR: Requested URL \"" + httpRequest.getRequestURL().toString() + "\" does not exist on this server.");
+                LOGGER.log(Level.FINE, "Received malformed request \"{0}\" from host {1} (IP {2})", new Object[]{httpRequest.getRequestURL().toString(), httpRequest.getRemoteHost(), httpRequest.getRemoteAddr()});
                 return;
             }
         }
