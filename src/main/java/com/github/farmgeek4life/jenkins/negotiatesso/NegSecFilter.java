@@ -87,17 +87,17 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         String requestUri = httpRequest.getRequestURI();
-        LOGGER.log(Level.FINEST, "Request URI: " + requestUri);
         // After Jenkins 1.590:
         //Jenkins jenkins = Jenkins.getActiveInstance();
         if (!shouldAttemptAuthentication(Jenkins.getInstance(), httpRequest, requestUri)) {
-            LOGGER.log(Level.FINER, "Bypassing authentication for " + requestUri);
+            LOGGER.log(Level.FINEST, "Bypassing authentication for {0}", requestUri);
             chain.doFilter(request, response);
             return;
         }
         
         if (this.allowLocalhost && httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
             // User is localhost, and we want to skip authenticating localhost
+            LOGGER.log(Level.FINEST, "Bypassing authentication for localhost to {0}", requestUri);
             chain.doFilter(request, response);
             return;
         }
@@ -110,6 +110,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 if (!requestedDomain.toLowerCase().contains(this.redirect.toLowerCase())) {
                     String redirectURL = requestedURL.replaceFirst(requestedDomain, requestedDomain + "." + this.redirect);
                     HttpServletResponse httpResponse = (HttpServletResponse)response;
+                    LOGGER.log(Level.FINEST, "Sending redirect for access to {0}", requestUri);
                     httpResponse.sendRedirect(redirectURL);
                     return;
                 }
@@ -127,12 +128,12 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
                 || Functions.isAnonymous()) {
             Functions.advertiseHeaders((HttpServletResponse)response); //Adds headers for CLI
-            LOGGER.log(Level.FINE, "Filtering request: " + requestUri);
+            LOGGER.log(Level.FINER, "Filtering request: " + requestUri);
             super.doFilter(request, response, chain); // Calls the authentication filter, which chains
         }
         else
         {
-            LOGGER.log(Level.FINER, "Bypassing filter - already authenticated: " + requestUri);
+            LOGGER.log(Level.FINEST, "Bypassing filter - already authenticated: " + requestUri);
             chain.doFilter(request, response); // just continue down the filter chain
         }
         
