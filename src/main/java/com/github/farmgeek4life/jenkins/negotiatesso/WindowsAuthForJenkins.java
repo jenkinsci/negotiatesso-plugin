@@ -77,7 +77,9 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
     @Override
     public IWindowsSecurityContext acceptSecurityToken(final String connectionId, final byte[] token, final String securityPackage) {
         IWindowsSecurityContext context = super.acceptSecurityToken(connectionId, token, securityPackage);
-        authenticateJenkins(context.getIdentity());
+        if (!context.isContinue()) {
+            authenticateJenkins(context.getIdentity());
+        }
         return context;
     }
     
