@@ -34,10 +34,6 @@ package com.github.farmgeek4life.jenkins.negotiatesso;
 
 import hudson.security.ACL;
 import hudson.security.SecurityRealm;
-import hudson.util.VersionNumber;
-import java.lang.reflect.Method;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import jenkins.security.SecurityListener;
 import org.acegisecurity.Authentication;
@@ -52,8 +48,6 @@ import waffle.windows.auth.impl.WindowsAuthProviderImpl;
  * @author Bryson Gibbons
  */
 public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
-    private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
-    
     /**
      * Called by BasicSecurityFilterProvider
      * @param username username from basic security filter
@@ -105,13 +99,6 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
         ACL.impersonate(authToken);
-        if (Jenkins.getVersion().isNewerThan(new VersionNumber("1.568"))) {
-            try {
-                Method fireLoggedIn = SecurityListener.class.getMethod("fireLoggedIn", String.class);
-                fireLoggedIn.invoke(null, userDetails.getUsername());
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Failed to invoke fireLoggedIn method {0}", e);
-            }
-        }
+        SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
 }
