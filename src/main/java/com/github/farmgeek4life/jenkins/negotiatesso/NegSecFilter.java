@@ -50,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.acegisecurity.context.SecurityContextHolder;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
 import jenkins.model.Jenkins;
 
 import waffle.servlet.NegotiateSecurityFilter;
@@ -141,26 +140,6 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     }
     
     /**
-     * Copied from Jenkins.ALWAYS_READABLE_PATHS. Should request a public access to it, or a split function.
-     * Urls that are always visible without READ permission.
-     *
-     * <p>See also:{@link #getUnprotectedRootActions}.
-     */
-    private static final ImmutableSet<String> ALWAYS_READABLE_PATHS = ImmutableSet.of(
-        "/login",
-        "/logout",
-        "/accessDenied",
-        "/adjuncts/",
-        "/error",
-        "/oops",
-        "/signup",
-        "/tcpSlaveAgentListener",
-        "/federatedLoginService/",
-        "/securityRealm",
-        "/userContent" // not added in Jenkins.java, but obviously needed in this case...
-    );
-    
-    /**
      * Remove the hostname and the query string from a requested URI
      * @param requestURI the requested URI
      * @return the cleaned portion of the URI
@@ -193,34 +172,8 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         // Code copied from Jenkins.getTarget(); need the rest, but not the permission check.
         String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
-        for (String name : ALWAYS_READABLE_PATHS) {
-            if (rest.startsWith(name)) {
-                LOGGER.log(Level.FINEST, "NoAuthRequired: Always readable path: " + rest);
-                return false;
-            }
-        }
-        
-        // uses Stapler.getCurrentRequest().getParameter("encrypt") in Jenkins.getTarget()
-        if (rest.matches("/computer/[^/]+/slave-agent[.]jnlp") 
-                && "true".equals(request.getParameter("encrypt"))) {
-                LOGGER.log(Level.FINEST, "NoAuthRequired: Slave agent jnlp: " + rest);
-            return false;
-        }
-        
-        // remaining checks require access to jenkins 
-        // if no access to jenkins, assume authentication should be attempted
-        if (jenkins == null) {
-            return true;
-        }
-        
-        for (String name : jenkins.getUnprotectedRootActions()) {
-            if (rest.startsWith("/" + name + "/") || rest.equals("/" + name)) {
-                LOGGER.log(Level.FINEST, "NoAuthRequired: Unprotected root action: " + rest);
-                return false;
-            }
-        }
-
-        return true;
+        // First available in Jenkins version 2.37
+        return Jenkins.getInstance().isSubjectToMandatoryReadPermissionCheck(rest);
     }
     
     private static boolean containsBypassHeader(ServletRequest request) {

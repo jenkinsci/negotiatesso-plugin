@@ -78,15 +78,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      */
     public static NegotiateSSO getInstance() {
         Jenkins jenkins = Jenkins.getInstance();
-        // After Jenkins 1.590:
-        //Jenkins jenkins = Jenkins.getActiveInstance();
-        if (jenkins != null) {
-            return jenkins.getDescriptorByType(NegotiateSSO.class);
-            //return jenkins.getPluginManager().getPlugin(NegotiateSSO.class);
-            //return jenkins.getPlugin(NegotiateSSO.class);
-        } else {
-            return null;
-        }
+        return jenkins.getDescriptorByType(NegotiateSSO.class);
     }
     
     /**

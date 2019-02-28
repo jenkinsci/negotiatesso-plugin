@@ -89,16 +89,13 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
             principalName = principalName.substring(principalName.indexOf("\\") + 1);
         }
         Jenkins jenkins = Jenkins.getInstance();
-        if (jenkins == null) {
-            return;
-        }
         SecurityRealm realm = jenkins.getSecurityRealm();
         UserDetails userDetails = realm.loadUserByUsername(principalName);
         Authentication authToken = new UsernamePasswordAuthenticationToken(
                         userDetails.getUsername(),
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
-        ACL.impersonate(authToken);
+        ACL.as(authToken);
         SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
 }
