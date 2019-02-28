@@ -7,17 +7,10 @@
   </parent>
 
   <properties>
-    <!-- First version of Jenkins that used jna-4.1.0 -->
-    <jenkins.version>1.586</jenkins.version>
-    <hpi-plugin.version>1.106</hpi-plugin.version>
-    <java.level>6</java.level>
-    <!-- waffle-jna 1.8.0 has dependencies on Java 7; minimum Jenkins version must be 1.612 -->
-    <waffle.version>1.7.5</waffle.version>
-    <!-- First version of Jenkins that requires Java 1.7 -->
-    <!-- <jenkins.version>1.612</jenkins.version>
+    <jenkins.version>1.612</jenkins.version>
     <hpi-plugin.version>1.110</hpi-plugin.version>
     <java.level>7</java.level>
-    <waffle.version>1.8.0</waffle.version> -->
+    <waffle.version>1.8.3</waffle.version>
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
@@ -56,7 +49,7 @@
   </pluginRepositories>
   <dependencies>
     <dependency>
-      <groupId>com.github.dblock.waffle</groupId>
+      <groupId>com.github.waffle</groupId>
       <artifactId>waffle-jna</artifactId>
       <version>${waffle.version}</version>
     </dependency>
