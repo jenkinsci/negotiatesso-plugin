@@ -3,14 +3,14 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>2.24</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
+    <version>3.39</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
+    <relativePath />
   </parent>
 
   <properties>
-    <jenkins.version>2.37</jenkins.version>
-    <hpi-plugin.version>1.110</hpi-plugin.version>
-    <java.level>7</java.level>
-    <waffle.version>1.8.3</waffle.version>
+    <jenkins.version>2.54</jenkins.version>
+    <java.level>8</java.level>
+    <waffle.version>1.9.0</waffle.version>
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
