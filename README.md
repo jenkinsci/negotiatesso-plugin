@@ -1,6 +1,6 @@
 ## NegotiateSSO
 
-[![Build Status](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/badge/icon)](https://jenkins.ci.cloudbees.com/job/plugins/job/negotiate-sso-plugin/)
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins/negotiatesso-plugin/master)](https://ci.jenkins.io/blue/organizations/jenkins/Plugins%2Fnegotiatesso-plugin/branches/)
 
 A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environment, using only the built-in Jetty web server.
 
