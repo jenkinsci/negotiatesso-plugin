@@ -31,6 +31,7 @@ package com.github.farmgeek4life.jenkins.negotiatesso;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.SecurityRealm;
+import hudson.util.VersionNumber;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -75,7 +76,6 @@ public class NegSecUserSeedFilter implements Filter {
     /**
      * Perform the authentication methods for Jenkins
      */
-    @SuppressRestrictedWarnings(UserSeedProperty.class)
     private void authenticateJenkins(WindowsPrincipal principal, HttpServletRequest httpRequest) {
         String principalName = principal.getName();
         if (principalName.contains("@")) {
@@ -92,21 +92,34 @@ public class NegSecUserSeedFilter implements Filter {
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
         ACL.as(authToken);
-        
+        populateUserSeed(httpRequest, userDetails.getUsername());              
+        SecurityListener.fireLoggedIn(userDetails.getUsername());
+    }
+    
+    /**
+     * This request is in a filter before the Stapler for pre-authentication for that reason we need to keep the code
+     * that applies the same logic as UserSeedSecurityListener.
+     * Copied from Kerberos-SSO plugin.
+     * @param httpRequest Current request.
+     * @param username Authenticated username.
+     */
+    @SuppressRestrictedWarnings(UserSeedProperty.class)
+    private void populateUserSeed(HttpServletRequest httpRequest, String username) {
+        VersionNumber current = Jenkins.getVersion();
+        if (current == null || current.isNewerThan(new VersionNumber("2.150.99")) && current.isOlderThan(new VersionNumber("2.160"))) {
+            // We have to depend on API introduced in 2.150.2 and 1.160 hence we need to skip this for ["2.151", "2.159"]
+            return;
+        }
+
         // Adapted from hudson.security.AuthenticationProcessingFilter2
-        HttpSession newSession = httpRequest.getSession();
-
         if (!UserSeedProperty.DISABLE_USER_SEED) {
-            User user = User.getById(userDetails.getUsername(), true);
+            User user = User.getById(username, true);
 
+            HttpSession newSession = httpRequest.getSession();
             UserSeedProperty userSeed = user.getProperty(UserSeedProperty.class);
             String sessionSeed = userSeed.getSeed();
             newSession.setAttribute(UserSeedProperty.USER_SESSION_SEED, sessionSeed);
         }
-
-        // This request is in a filter before the Stapler for pre-authentication
-        // for that reason we need to keep the above code that applies the same logic as UserSeedSecurityListener                
-        SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
 
     @Override
