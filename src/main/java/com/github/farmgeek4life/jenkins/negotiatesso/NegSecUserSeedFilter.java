@@ -21,10 +21,6 @@
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
  * 
- *  This class extends a Waffle class. See https://github.com/dblock/waffle for 
- *  appropriate licenses for Waffle, which are not included here (as I do not 
- *  include any source code from Waffle).
- * 
  *  Portions of this code are based on the KerberosSSO plugin, also licensed 
  *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
  *  for license details.
@@ -32,63 +28,63 @@
 
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
+import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.SecurityRealm;
+import java.io.IOException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import waffle.servlet.NegotiateRequestWrapper;
+import waffle.servlet.WindowsPrincipal;
 import jenkins.model.Jenkins;
 import jenkins.security.SecurityListener;
+import jenkins.security.seed.UserSeedProperty;
 import org.acegisecurity.Authentication;
 import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
 import org.acegisecurity.userdetails.UserDetails;
-import waffle.windows.auth.IWindowsIdentity;
-import waffle.windows.auth.IWindowsSecurityContext;
-import waffle.windows.auth.impl.WindowsAuthProviderImpl;
+import org.kohsuke.accmod.restrictions.suppressions.SuppressRestrictedWarnings;
 
 /**
- * Subclassed authentication implementation to integrate with Jenkins authentication
- * @author Bryson Gibbons
+ * A post-NegotiateAuthentication filter that will properly populate the UserSeed information for the session
+ * @author Bryson Gibbons;
  */
-public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
-    /**
-     * Called by BasicSecurityFilterProvider
-     * @param username username from basic security filter
-     * @param password password from basic security filter
-     * @return user identity
-     */
+public class NegSecUserSeedFilter implements Filter {
+
     @Override
-    public IWindowsIdentity logonUser(final String username, final String password) {
-       IWindowsIdentity id = super.logonUser(username, password);
-       authenticateJenkins(id);
-       return id;
+    public void init(FilterConfig fc) throws ServletException {
+        // Nothing to do.
     }
-    
-    /**
-     * Called by NegotiateSecurityFilterProvider
-     * @param connectionId unique connection id
-     * @param token client's security token
-     * @param securityPackage security package - Negotiate, kerberos, or NTLM
-     * @return authentication context
-     */
+
     @Override
-    public IWindowsSecurityContext acceptSecurityToken(final String connectionId, final byte[] token, final String securityPackage) {
-        IWindowsSecurityContext context = super.acceptSecurityToken(connectionId, token, securityPackage);
-        if (!context.isContinue()) {
-            authenticateJenkins(context.getIdentity());
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+        if (request instanceof NegotiateRequestWrapper) {
+            NegotiateRequestWrapper nrw = (NegotiateRequestWrapper) request;
+            WindowsPrincipal principal = (WindowsPrincipal) nrw.getUserPrincipal();
+            authenticateJenkins(principal, (HttpServletRequest) request);
         }
-        return context;
+        
+        chain.doFilter(request, response);
     }
     
     /**
      * Perform the authentication methods for Jenkins
      */
-    private void authenticateJenkins(IWindowsIdentity windowsIdentity) {
-        String principalName = windowsIdentity.getFqn();
+    @SuppressRestrictedWarnings(UserSeedProperty.class)
+    private void authenticateJenkins(WindowsPrincipal principal, HttpServletRequest httpRequest) {
+        String principalName = principal.getName();
         if (principalName.contains("@")) {
             principalName = principalName.substring(0, principalName.indexOf("@"));
         }
         if (principalName.contains("\\")) {
             principalName = principalName.substring(principalName.indexOf("\\") + 1);
         }
-        Jenkins jenkins = Jenkins.getInstance();
+        Jenkins jenkins = Jenkins.get();
         SecurityRealm realm = jenkins.getSecurityRealm();
         UserDetails userDetails = realm.loadUserByUsername(principalName);
         Authentication authToken = new UsernamePasswordAuthenticationToken(
@@ -96,6 +92,26 @@ public class WindowsAuthForJenkins extends WindowsAuthProviderImpl {
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
         ACL.as(authToken);
+        
+        // Adapted from hudson.security.AuthenticationProcessingFilter2
+        HttpSession newSession = httpRequest.getSession();
+
+        if (!UserSeedProperty.DISABLE_USER_SEED) {
+            User user = User.getById(userDetails.getUsername(), true);
+
+            UserSeedProperty userSeed = user.getProperty(UserSeedProperty.class);
+            String sessionSeed = userSeed.getSeed();
+            newSession.setAttribute(UserSeedProperty.USER_SESSION_SEED, sessionSeed);
+        }
+
+        // This request is in a filter before the Stapler for pre-authentication
+        // for that reason we need to keep the above code that applies the same logic as UserSeedSecurityListener                
         SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
+
+    @Override
+    public void destroy() {
+        // Nothing to do.
+    }
+    
 }

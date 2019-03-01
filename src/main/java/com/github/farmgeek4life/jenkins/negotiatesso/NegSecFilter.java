@@ -88,7 +88,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         String requestUri = httpRequest.getRequestURI();
         // After Jenkins 1.590:
         //Jenkins jenkins = Jenkins.getActiveInstance();
-        if (!shouldAttemptAuthentication(Jenkins.getInstance(), httpRequest, requestUri)) {
+        if (!shouldAttemptAuthentication(Jenkins.get(), httpRequest, requestUri)) {
             LOGGER.log(Level.FINEST, "Bypassing authentication for {0}", requestUri);
             chain.doFilter(request, response);
             return;
@@ -173,7 +173,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // Code copied from Jenkins.getTarget(); need the rest, but not the permission check.
         String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
         // First available in Jenkins version 2.37
-        return Jenkins.getInstance().isSubjectToMandatoryReadPermissionCheck(rest);
+        return Jenkins.get().isSubjectToMandatoryReadPermissionCheck(rest);
     }
     
     private static boolean containsBypassHeader(ServletRequest request) {
