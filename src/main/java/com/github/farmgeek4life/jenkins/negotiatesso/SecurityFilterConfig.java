@@ -47,7 +47,6 @@ public class SecurityFilterConfig implements FilterConfig {
         allowedParams.put("allowGuestLogin", Boolean.TRUE);
         allowedParams.put("impersonate", Boolean.TRUE);
         allowedParams.put("securityFilterProviders", Boolean.TRUE);
-        allowedParams.put("authProvider", Boolean.TRUE);
         //allowedParams.put("allowLocalhost", Boolean.TRUE);
         //allowedParams.put("redirectEnabled", Boolean.TRUE);
         //allowedParams.put("redirect", Boolean.TRUE);

@@ -28,16 +28,13 @@
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
 import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
-
-import java.util.ArrayList;
+import org.junit.runners.model.Statement;
+import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -58,19 +55,7 @@ public class NegotiateConfigTests {
      */
     // CS IGNORE VisibilityModifier FOR NEXT 3 LINES. REASON: Mocks tests.
     @Rule
-    public JenkinsRule rule = new JenkinsRule();
-    private JenkinsRule.WebClient webClient;
-    private HtmlPage currentPage;
-
-    /**
-     * Sets up a a web client that navigates to the global config page.
-     * @throws Exception if something goes wrong
-     */
-    @Before
-    public void setUp() throws Exception {
-        webClient = rule.createWebClient();
-        currentPage = webClient.goTo("configureSecurity");
-    }
+    public RestartableJenkinsRule rule = new RestartableJenkinsRule();
     
     /**
      * 
@@ -84,8 +69,13 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testNegotiateHasConfigPage() {
-        HtmlElement enabled = currentPage.getElementByName("_.enabled");
-        assertNotNull("Negotiate configuration page missing.", enabled);
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlElement enabled = currentPage.getElementByName("_.enabled");
+                assertNotNull("Negotiate configuration page missing.", enabled);
+            }
+        });
 
     }
 
@@ -94,9 +84,14 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testEnableNegotiate() {
-        HtmlElement enabled = currentPage.getElementByName("_.enabled");
-        enabled.fireEvent("click");
-        assertNotNull("Optional block wasn't expanded.", currentPage.getElementByName("_.redirectEnabled"));
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlElement enabled = currentPage.getElementByName("_.enabled");
+                enabled.fireEvent("click");
+                assertNotNull("Optional block wasn't expanded.", currentPage.getElementByName("_.redirectEnabled"));
+            }
+        });
     }
 
     /**
@@ -105,30 +100,33 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testIfConfigCanBeUpdated() throws Exception {
-        assertFalse("Plugin already enabled", NegotiateSSO.getInstance().getEnabled());
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                assertFalse("Plugin already enabled", NegotiateSSO.getInstance().getEnabled());
+                
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlForm form = currentPage.getFormByName("config");
+                assertNotNull(form);
 
-        HtmlForm form = currentPage.getFormByName("config");
-        assertNotNull(form);
+                form.getInputByName("_.enabled").click();
+                form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
+                form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
 
-        form.getInputByName("_.enabled").click();
-        form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
-        form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
+                try {
+                    rule.j.submit(form);
+                    // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
+                } catch (FailingHttpStatusCodeException e) {
+                    // Expected since filter cannot be added to Jenkins rule.
+                }
 
-        try {
-            ArrayList<HtmlElement> elements = (ArrayList<HtmlElement>)form.getHtmlElementsByTagName("button");
-            HtmlButton button = (HtmlButton)elements.get(elements.size() - 1);
-            button.click();
-            // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
-        } catch (FailingHttpStatusCodeException e) {
-            // Expected since filter cannot be added to Jenkins rule.
-        }
-
-        boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
-        if (IsWindowsOS()) {
-            assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
-        }
-        else {
-            assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
-        }
+                boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
+                if (IsWindowsOS()) {
+                    assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
+                }
+                else {
+                    assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
+                }
+            }
+        });
     }
 }

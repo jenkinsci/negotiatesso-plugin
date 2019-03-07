@@ -43,7 +43,6 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import waffle.servlet.spi.BasicSecurityFilterProvider;
 import waffle.servlet.spi.NegotiateSecurityFilterProvider;
-import waffle.windows.auth.IWindowsAuthProvider;
 
 /**
  * The core of this Plugin. Handles the configuration of the Waffle
@@ -67,9 +66,9 @@ public final class NegotiateSSO extends GlobalConfiguration {
     private String roleFormat = "fqn";
     private String protocols = "Negotiate NTLM";
     private String providers = NegotiateSecurityFilterProvider.class.getName() + " " + BasicSecurityFilterProvider.class.getName();
-    private transient final IWindowsAuthProvider authProvider = new WindowsAuthForJenkins();
 
     private transient NegSecFilter filter;
+    private transient NegSecUserSeedFilter userSeedFilter;
 
     /**
      * Fetches the singleton instance of this plugin.
@@ -77,16 +76,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @return the instance.
      */
     public static NegotiateSSO getInstance() {
-        Jenkins jenkins = Jenkins.getInstance();
-        // After Jenkins 1.590:
-        //Jenkins jenkins = Jenkins.getActiveInstance();
-        if (jenkins != null) {
-            return jenkins.getDescriptorByType(NegotiateSSO.class);
-            //return jenkins.getPluginManager().getPlugin(NegotiateSSO.class);
-            //return jenkins.getPlugin(NegotiateSSO.class);
-        } else {
-            return null;
-        }
+        Jenkins jenkins = Jenkins.get();
+        return jenkins.getDescriptorByType(NegotiateSSO.class);
     }
     
     /**
@@ -155,7 +146,6 @@ public final class NegotiateSSO extends GlobalConfiguration {
         NegotiateSSO.LOGGER.log(Level.INFO, "Starting Security Filter");
         this.filter = new NegSecFilter();
         this.filter.setImpersonate(this.allowImpersonate);
-        this.filter.setAuth(this.authProvider);
         this.filter.setPrincipalFormat(this.principalFormat); // default "fqn", options "fqn", "sid", "both"
         this.filter.setRoleFormat(this.roleFormat); // default "fqn", options "fqn", "sid", "both", "none"
         this.filter.setAllowLocalhost(this.allowLocalhost);
@@ -168,8 +158,6 @@ public final class NegotiateSSO extends GlobalConfiguration {
         config.setParameter("securityFilterProviders", this.providers); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", NegotiateSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", BasicSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
-        config.setParameter("authProvider", this.authProvider.getClass().getName());
-        //config.setParameter("authProvider", WindowsAuthForJenkins.class.getName());
         
         //config.setParameter("allowLocalhost", String.valueOf(this.allowLocalhost));
         //config.setParameter("redirectEnabled", String.valueOf(this.redirectEnabled));
@@ -181,6 +169,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
         
         this.filter.init(config);
+        this.userSeedFilter = new NegSecUserSeedFilter();
+        this.userSeedFilter.init(null);
         
         // https://github.com/dblock/waffle/blob/master/Docs/tomcat/TomcatSingleSignOnValve.md
         //    fqn: Fully qualified names, such as domain\\username. When unavailable, a SID is used. This is the default.
@@ -188,6 +178,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         //    both: Both a fully qualified name and a SID in the S- format. The fully qualified name is placed in the list first. Tomcat assumes that the first entry of this list is a username.
         //    none Do not include a principal name. Permitted only for roleFormat.
         PluginServletFilter.addFilter(this.filter);
+        PluginServletFilter.addFilter(this.userSeedFilter);
     }
 
     /**
@@ -200,6 +191,12 @@ public final class NegotiateSSO extends GlobalConfiguration {
             PluginServletFilter.removeFilter(this.filter);
             this.filter.destroy();
             this.filter = null;
+        }
+        
+        if (this.userSeedFilter != null) {
+            PluginServletFilter.removeFilter(this.userSeedFilter);
+            this.userSeedFilter.destroy();
+            this.userSeedFilter = null;
         }
     }
 
