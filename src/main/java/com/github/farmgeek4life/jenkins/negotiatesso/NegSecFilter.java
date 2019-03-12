@@ -172,6 +172,22 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         
         // Code copied from Jenkins.getTarget(); need the rest, but not the permission check.
         String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
+
+        // isSubjectToMandatoryReadPermissionCheck() uses Stapler.getCurrentRequest().getParameter("encrypt")
+        // However, this filter runs before Stapler captures the current request, which will usually lead to a NullPointerException
+        // To avoid this, we manually check the slave-agent requests, and handle them in a similar fashion.
+        if (rest.matches("/computer/[^/]+/slave-agent[.]jnlp")) {
+            if ("true".equals(request.getParameter("encrypt"))) {
+                LOGGER.log(Level.FINEST, "NoAuthRequired: Slave agent jnlp: " + rest);
+                return false;
+            }
+            else {
+                LOGGER.log(Level.FINEST, "AuthRequired: Slave agent jnlp: " + rest);
+                return true;
+            }
+        }
+
+        // Use the Jenkins core method to determine what other paths are readable without permission checks
         // First available in Jenkins version 2.37
         return Jenkins.get().isSubjectToMandatoryReadPermissionCheck(rest);
     }
