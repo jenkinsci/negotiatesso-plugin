@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.39</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
+    <version>3.40</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
     <relativePath />
   </parent>
 
@@ -56,13 +56,6 @@
     <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
-      <version>1.10.19</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-core</artifactId>
-      <version>1.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>

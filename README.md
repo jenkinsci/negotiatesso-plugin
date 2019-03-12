@@ -12,6 +12,7 @@ A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environ
 * Windows system account (on the domain) must be configured to allow kerberos authentication (HTTP SPNs)
 * Clients accessing Jenkins must be on the same domain (Not tested in a cross-domain environment)
 * Access to Jenkins using a web browser on the hosting system is recommended during initial configuration (as is leaving "Allow Localhost" checked until it all works)
+* If you see HTTP 413 errors when using this plugin, you might need to increase the request header size. This is done by editing %JENKINS_HOME%\jenkins.xml and adding `--requestHeaderSize=16384` to the Jenkins command-line argument.
 
 NOTE: if "Specify custom Active Directory domain name" is used with the Active Directory plugin, then the "Bind DN" under the "Advanced" settings for the Active Directory plugin must be set correctly.
 
