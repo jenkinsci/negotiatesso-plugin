@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletContext;
 
@@ -100,12 +99,7 @@ public class SecurityFilterConfig implements FilterConfig {
      * @return Enumeration of parameter names
      */
     @Override
-    public Enumeration getInitParameterNames() {
-        StringBuilder tokenizer = new StringBuilder();
-        for (String param : params.keySet()) {
-            tokenizer.append(param).append(";");
-        }
-        return new StringTokenizer(tokenizer.toString(), ";");
-    }
-    
+    public Enumeration<String> getInitParameterNames() {
+        return Collections.enumeration(params.keySet());
+    }    
 }
