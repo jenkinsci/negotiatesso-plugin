@@ -31,7 +31,8 @@
     </developer>
   </developers>
 
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Negotiate+SSO+for+Windows</url>
+  <!--<url>https://wiki.jenkins-ci.org/display/JENKINS/Negotiate+SSO+for+Windows</url>-->
+  <url>https://github.com/jenkinsci/negotiatesso-plugin</url>
 
   <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
   <repositories>

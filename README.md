@@ -1,8 +1,13 @@
 ## NegotiateSSO
 
 [![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins/negotiatesso-plugin/master)](https://ci.jenkins.io/blue/organizations/jenkins/Plugins%2Fnegotiatesso-plugin/branches/)
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/NegotiateSSO.svg)](https://plugins.jenkins.io/NegotiateSSO)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/negotiatesso-plugin.svg?label=changelog)](https://github.com/jenkinsci/negotiatesso-plugin/releases/latest)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/NegotiateSSO.svg?color=blue)](https://plugins.jenkins.io/NegotiateSSO)
 
-A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environment, using only the built-in Jetty web server.
+**Only works for Jenkins server on Windows**
+
+A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environment, using only the built-in Jetty web server. Requests and uses Kerberos or NTLM tickets to authenticate (Uses Windows' Negotiate protocol) 
 
 # Requirements:
 * Jenkins is running as a service
@@ -16,7 +21,7 @@ A SSO plugin for Jenkins 1.586 and above, running on Windows in a domain environ
 
 NOTE: if "Specify custom Active Directory domain name" is used with the Active Directory plugin, then the "Bind DN" under the "Advanced" settings for the Active Directory plugin must be set correctly.
 
-For this plugin to work, Jenkins needs to be running as a service that has permission to perform kerberos authentication, and the system needs to have a domain configuration that allows kerberos authentication. See https://github.com/dblock/waffle/blob/master/Docs/Troubleshooting.md for some tips on this.
+For this plugin to work, Jenkins needs to be running as a service that has permission to perform kerberos authentication, and the system needs to have a domain configuration that allows kerberos authentication. See https://github.com/Waffle/waffle/blob/master/Docs/Troubleshooting.md for some tips on this.
 
 My testing configuration has Jenkins running as hostname\Network Service, with HTTP/hostname and HTTP/hostname.domain SPNs. (NOTE: Previously used hostname\Local System, but changed it to hostname\Network Service for security purposes. Doing so originally broke the jenkins restart, until I edited permissions on the jenkins service using the [Service Security Editor tool] (http://www.coretechnologies.com/products/ServiceSecurityEditor/) to allow Network Service to start/stop/restart the jenkins service.)
 
