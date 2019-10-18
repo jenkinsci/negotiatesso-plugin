@@ -8,9 +8,11 @@
   </parent>
 
   <properties>
-    <jenkins.version>2.150.2</jenkins.version>
+    <jenkins.version>2.181</jenkins.version>
     <java.level>8</java.level>
-    <waffle.version>1.9.0</waffle.version>
+    <waffle.version>2.0.0</waffle.version>
+    <jna.version>5.3.1</jna.version>
+    <slf4j.version>2.0.0-alpha0</slf4j.version><!-- Upgraded over jenkins requirement because of Waffle -->
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
@@ -53,6 +55,31 @@
       <groupId>com.github.waffle</groupId>
       <artifactId>waffle-jna</artifactId>
       <version>${waffle.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
+      <version>${jna.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
+      <version>${jna.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-jdk14</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mockito</groupId>
