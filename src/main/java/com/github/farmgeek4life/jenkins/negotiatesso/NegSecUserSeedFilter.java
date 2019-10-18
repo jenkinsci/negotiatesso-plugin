@@ -105,12 +105,6 @@ public class NegSecUserSeedFilter implements Filter {
      */
     @SuppressRestrictedWarnings(UserSeedProperty.class)
     private void populateUserSeed(HttpServletRequest httpRequest, String username) {
-        VersionNumber current = Jenkins.getVersion();
-        if (current == null || current.isNewerThan(new VersionNumber("2.150.99")) && current.isOlderThan(new VersionNumber("2.160"))) {
-            // We have to depend on API introduced in 2.150.2 and 1.160 hence we need to skip this for ["2.151", "2.159"]
-            return;
-        }
-
         // Adapted from hudson.security.AuthenticationProcessingFilter2
         if (!UserSeedProperty.DISABLE_USER_SEED) {
             User user = User.getById(username, true);
