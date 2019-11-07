@@ -1,2 +1,2 @@
 _extends: .github
-tag-template: promoted-builds-$NEXT_MINOR_VERSION
+tag-template: negotiatesso-$NEXT_MINOR_VERSION
