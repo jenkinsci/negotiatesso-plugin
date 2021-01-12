@@ -7,7 +7,7 @@
 See [GitHub Releases](https://github.com/jenkinsci/negotiatesso-plugin/releases)
 
 ##### Version 1.3 (JUN 4, 2018)
--   Fix a exception instroduced in version 1.2
+-   Fix an exception introduced in version 1.2
 
 ##### Version 1.2 (JUN 4, 2018)
 -   [JENKINS-55697](https://issues.jenkins-ci.org/browse/JENKINS-55697) Security-901 Set user seed on successful authentication

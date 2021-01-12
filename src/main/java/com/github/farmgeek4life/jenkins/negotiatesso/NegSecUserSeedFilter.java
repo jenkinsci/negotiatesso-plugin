@@ -31,7 +31,6 @@ package com.github.farmgeek4life.jenkins.negotiatesso;
 import hudson.model.User;
 import hudson.security.ACL;
 import hudson.security.SecurityRealm;
-import hudson.util.VersionNumber;
 import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
