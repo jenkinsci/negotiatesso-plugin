@@ -8,8 +8,7 @@
   </parent>
 
   <properties>
-    <revision>1.5</revision>
-    <changelist>-SNAPSHOT</changelist>
+    <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
     <jenkins.version>2.274</jenkins.version><!-- First version of Jenkins running JNA 5.6.0 -->
     <java.level>8</java.level>
@@ -19,7 +18,7 @@
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
-  <version>${revision}${changelist}</version>
+  <version>${changelist}</version>
   <name>Windows Negotiate SSO plugin</name>
   <packaging>hpi</packaging>
 
