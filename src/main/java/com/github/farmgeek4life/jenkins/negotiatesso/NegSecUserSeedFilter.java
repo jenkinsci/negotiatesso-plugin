@@ -45,9 +45,9 @@ import waffle.servlet.WindowsPrincipal;
 import jenkins.model.Jenkins;
 import jenkins.security.SecurityListener;
 import jenkins.security.seed.UserSeedProperty;
-import org.acegisecurity.Authentication;
-import org.acegisecurity.providers.UsernamePasswordAuthenticationToken;
-import org.acegisecurity.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.kohsuke.accmod.restrictions.suppressions.SuppressRestrictedWarnings;
 
 /**
@@ -85,12 +85,12 @@ public class NegSecUserSeedFilter implements Filter {
         }
         Jenkins jenkins = Jenkins.get();
         SecurityRealm realm = jenkins.getSecurityRealm();
-        UserDetails userDetails = realm.loadUserByUsername(principalName);
+        UserDetails userDetails = realm.loadUserByUsername2(principalName);
         Authentication authToken = new UsernamePasswordAuthenticationToken(
                         userDetails.getUsername(),
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
-        ACL.as(authToken);
+        ACL.as2(authToken);
         populateUserSeed(httpRequest, userDetails.getUsername());              
         SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
