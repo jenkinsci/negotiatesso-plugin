@@ -8,6 +8,9 @@
   </parent>
 
   <properties>
+    <revision>1.5</revision>
+    <changelist>-SNAPSHOT</changelist>
+    <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
     <jenkins.version>2.274</jenkins.version><!-- First version of Jenkins running JNA 5.6.0 -->
     <java.level>8</java.level>
     <waffle.version>3.0.0</waffle.version>
@@ -16,7 +19,7 @@
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
-  <version>1.5-SNAPSHOT</version>
+  <version>${revision}${changelist}</version>
   <name>Windows Negotiate SSO plugin</name>
   <packaging>hpi</packaging>
 
@@ -94,9 +97,9 @@
   </dependencies>
 
   <scm>
-    <connection>scm:git:ssh://github.com/jenkinsci/negotiatesso-plugin.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/negotiatesso-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/negotiatesso-plugin</url>
-    <tag>HEAD</tag>
+    <connection>scm:git:ssh://github.com/${gitHubRepo}.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/${gitHubRepo}.git</developerConnection>
+    <url>https://github.com/${gitHubRepo}</url>
+    <tag>${scmTag}</tag>
   </scm>
 </project>
