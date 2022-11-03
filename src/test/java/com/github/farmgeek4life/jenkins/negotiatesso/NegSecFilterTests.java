@@ -57,7 +57,7 @@ public class NegSecFilterTests {
         // ALWAYS_READABLE_PATHS
 		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/login"));
 		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/tcpSlaveAgentListener"));
-		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/instance-identity"));
+		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/securityRealm"));
         
         //computer slave-agent jnlp
         // Disabled: exception being thrown in call to Jenkins.isSubjectToMandatoryReadPermissionCheck(rest)
@@ -67,6 +67,9 @@ public class NegSecFilterTests {
 		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/cli"));
 		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/jnlpJars"));
 		assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/whoAmI"));
+        // Disabled: This was changed into a plugin, so it fails in the test harness because the plugin is not installed
+		//assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/instance-identity"));
+        // others include 'assetManager', 'wsagents' (when supported/enabled), 'static-files'
         
         // Unprotected root actions, separate plugins - must be installed in the testing jenkins instance to work
 		//assertFalse(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/subversion/notifyCommit"));
