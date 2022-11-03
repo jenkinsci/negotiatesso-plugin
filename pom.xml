@@ -13,7 +13,7 @@
     <jenkins.version>2.274</jenkins.version><!-- First version of Jenkins running JNA 5.6.0 -->
     <java.level>8</java.level>
     <waffle.version>3.0.0</waffle.version>
-    <jna.version>5.6.0</jna.version>
+    <jna.version>5.12.1</jna.version>
     <slf4j.version>2.0.0-alpha1</slf4j.version><!-- Upgraded over jenkins requirement because of Waffle -->
   </properties>
 
