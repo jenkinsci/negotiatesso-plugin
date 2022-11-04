@@ -35,7 +35,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-import org.jvnet.hudson.test.RestartableJenkinsRule.Step;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -70,10 +69,12 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testNegotiateHasConfigPage() {
-        rule.then(r -> {
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlElement enabled = currentPage.getElementByName("_.enabled");
-            assertNotNull("Negotiate configuration page missing.", enabled);            
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlElement enabled = currentPage.getElementByName("_.enabled");
+                assertNotNull("Negotiate configuration page missing.", enabled);
+            }
         });
 
     }
@@ -83,11 +84,13 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testEnableNegotiate() {
-        rule.then(r -> {
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlElement enabled = currentPage.getElementByName("_.enabled");
-            enabled.fireEvent("click");
-            assertNotNull("Optional block wasn't expanded.", currentPage.getElementByName("_.redirectEnabled"));
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlElement enabled = currentPage.getElementByName("_.enabled");
+                enabled.fireEvent("click");
+                assertNotNull("Optional block wasn't expanded.", currentPage.getElementByName("_.redirectEnabled"));
+            }
         });
     }
 
@@ -97,30 +100,32 @@ public class NegotiateConfigTests {
      */
     @Test
     public void testIfConfigCanBeUpdated() throws Exception {
-        rule.then(r -> {
-            assertFalse("Plugin already enabled", NegotiateSSO.getInstance().getEnabled());
+        rule.addStep(new Statement() {
+            @Override public void evaluate() throws Throwable {
+                assertFalse("Plugin already enabled", NegotiateSSO.getInstance().getEnabled());
+                
+                HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
+                HtmlForm form = currentPage.getFormByName("config");
+                assertNotNull(form);
 
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlForm form = currentPage.getFormByName("config");
-            assertNotNull(form);
+                form.getInputByName("_.enabled").click();
+                form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
+                form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
 
-            form.getInputByName("_.enabled").click();
-            form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
-            form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
+                try {
+                    rule.j.submit(form);
+                    // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
+                } catch (FailingHttpStatusCodeException e) {
+                    // Expected since filter cannot be added to Jenkins rule.
+                }
 
-            try {
-                rule.j.submit(form);
-                // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
-            } catch (FailingHttpStatusCodeException e) {
-                // Expected since filter cannot be added to Jenkins rule.
-            }
-
-            boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
-            if (IsWindowsOS()) {
-                assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
-            }
-            else {
-                assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
+                boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
+                if (IsWindowsOS()) {
+                    assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
+                }
+                else {
+                    assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
+                }
             }
         });
     }
