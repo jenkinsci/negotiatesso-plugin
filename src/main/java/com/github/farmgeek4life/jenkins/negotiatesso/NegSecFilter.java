@@ -175,14 +175,14 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
 
         // isSubjectToMandatoryReadPermissionCheck() uses Stapler.getCurrentRequest().getParameter("encrypt")
         // However, this filter runs before Stapler captures the current request, which will usually lead to a NullPointerException
-        // To avoid this, we manually check the slave-agent requests, and handle them in a similar fashion.
-        if (rest.matches("/computer/[^/]+/slave-agent[.]jnlp")) {
+        // To avoid this, we manually check the slave-agent/jenkins-agent requests, and handle them in a similar fashion.
+        if (isAgentJnlpPath(rest, "jenkins") || isAgentJnlpPath(rest, "slave")) {
             if ("true".equals(request.getParameter("encrypt"))) {
-                LOGGER.log(Level.FINEST, "NoAuthRequired: Slave agent jnlp: " + rest);
+                LOGGER.log(Level.FINEST, "NoAuthRequired: Jenkins agent jnlp: " + rest);
                 return false;
             }
             else {
-                LOGGER.log(Level.FINEST, "AuthRequired: Slave agent jnlp: " + rest);
+                LOGGER.log(Level.FINEST, "AuthRequired: Jenkins agent jnlp: " + rest);
                 return true;
             }
         }
@@ -190,6 +190,13 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // Use the Jenkins core method to determine what other paths are readable without permission checks
         // First available in Jenkins version 2.37
         return Jenkins.get().isSubjectToMandatoryReadPermissionCheck(rest);
+    }
+
+    /**
+     * This is copied from https://github.com/jenkinsci/jenkins/blob/master/core/src/main/java/jenkins/model/Jenkins.java
+     */
+    private static boolean isAgentJnlpPath(String restOfPath, String prefix) {
+        return restOfPath.matches("(/manage)?/computer/[^/]+/" + prefix + "-agent[.]jnlp");
     }
     
     private static boolean containsBypassHeader(ServletRequest request) {
