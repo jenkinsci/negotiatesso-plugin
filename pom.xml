@@ -10,9 +10,9 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
-    <jenkins.version>2.321</jenkins.version><!-- First version of Jenkins running JNA 5.10.0 -->
+    <jenkins.version>2.357</jenkins.version><!-- First version of Jenkins running JNA 5.12.0 -->
     <java.level>11</java.level>
-    <waffle.version>3.1.1</waffle.version>
+    <waffle.version>3.2.0</waffle.version>
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
