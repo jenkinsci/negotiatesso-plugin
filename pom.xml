@@ -14,7 +14,7 @@
     <java.level>8</java.level>
     <waffle.version>2.0.0</waffle.version>
     <jna.version>5.3.1</jna.version>
-    <slf4j.version>2.0.0-alpha0</slf4j.version><!-- Upgraded over jenkins requirement because of Waffle -->
+    <slf4j.version>2.0.5</slf4j.version><!-- Upgraded over jenkins requirement because of Waffle -->
   </properties>
 
   <artifactId>NegotiateSSO</artifactId>
