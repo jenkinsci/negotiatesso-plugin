@@ -27,10 +27,10 @@
  */
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlForm;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import org.htmlunit.FailingHttpStatusCodeException;
+import org.htmlunit.html.HtmlElement;
+import org.htmlunit.html.HtmlForm;
+import org.htmlunit.html.HtmlPage;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runners.model.Statement;
