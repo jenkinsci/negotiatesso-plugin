@@ -41,12 +41,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.io.IOException;
 import java.net.URL;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -74,7 +74,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
      * @param response The response - used to redirect, advertise headers, or chain filters
      * @param chain The filter chain
      * @throws java.io.IOException pass-through from request/response/chain
-     * @throws javax.servlet.ServletException pass-through from request/response/chain
+     * @throws jakarta.servlet.ServletException pass-through from request/response/chain
      */
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)

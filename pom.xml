@@ -28,7 +28,10 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
-    <jenkins.version>2.462</jenkins.version>
+    <jenkins.version>2.475</jenkins.version><!-- Upgrade to Spring Security 6.x -->
+    <!-- TODO JENKINS-73339 until in parent POM -->
+    <jenkins-test-harness.version>2254.vcff7a_d4969e5</jenkins-test-harness.version>
+    <maven.compiler.release>17</maven.compiler.release>
     <waffle.version>2.3.0</waffle.version>
     <jna.version>5.14.0</jna.version><!-- Specified here because jna-platform does need to be the same version as jna -->
   </properties>
@@ -48,8 +51,14 @@
   <dependencies>
     <dependency>
       <groupId>com.github.waffle</groupId>
-      <artifactId>waffle-jna</artifactId>
+      <artifactId>waffle-jna-jakarta</artifactId>
       <version>${waffle.version}</version>
+    </dependency>
+    <!-- TODO JENKINS-73339 until in parent POM, work around https://github.com/jenkinsci/plugin-pom/issues/936 -->
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
