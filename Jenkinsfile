@@ -1,4 +1,4 @@
-#!/usr/bin/env groovy
-
-/* `buildPlugin` step provided by: https://github.com/jenkins-infra/pipeline-library */
-buildPlugin(platforms: ['windows'])
+buildPlugin(
+  configurations: [
+    [platform: 'windows', jdk: 17],
+])
