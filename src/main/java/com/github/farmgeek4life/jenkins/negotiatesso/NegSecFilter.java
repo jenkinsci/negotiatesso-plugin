@@ -74,7 +74,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
      * @param response The response - used to redirect, advertise headers, or chain filters
      * @param chain The filter chain
      * @throws java.io.IOException pass-through from request/response/chain
-     * @throws javax.servlet.ServletException pass-through from request/response/chain
+     * @throws jakarta.servlet.ServletException pass-through from request/response/chain
      */
     @Override
     public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
