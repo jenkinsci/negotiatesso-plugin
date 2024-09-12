@@ -1,6 +1,6 @@
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Rule;

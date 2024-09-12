@@ -51,7 +51,7 @@
   <dependencies>
     <dependency>
       <groupId>com.github.waffle</groupId>
-      <artifactId>waffle-jna</artifactId>
+      <artifactId>waffle-jna-jakarta</artifactId>
       <version>${waffle.version}</version>
     </dependency>
     <!-- TODO JENKINS-73339 until in parent POM, work around https://github.com/jenkinsci/plugin-pom/issues/936 -->

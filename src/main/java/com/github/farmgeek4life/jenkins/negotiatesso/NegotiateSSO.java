@@ -34,9 +34,9 @@ import hudson.util.ListBoxModel;
 import hudson.util.PluginServletFilter;
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.GlobalConfiguration;
@@ -212,7 +212,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
      * @throws Descriptor.FormException if any data in the form is wrong.
      */
     @Override
-    public boolean configure(StaplerRequest req, JSONObject formData)
+    public boolean configure(StaplerRequest2 req, JSONObject formData)
             throws Descriptor.FormException {
         try {
             if (!System.getProperty("os.name").toLowerCase().contains("win")) {
