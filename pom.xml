@@ -29,7 +29,7 @@
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
     <jenkins.version>2.462</jenkins.version>
-    <waffle.version>2.0.0</waffle.version>
+    <waffle.version>2.3.0</waffle.version>
     <jna.version>5.14.0</jna.version><!-- Specified here because jna-platform does need to be the same version as jna -->
   </properties>
 
