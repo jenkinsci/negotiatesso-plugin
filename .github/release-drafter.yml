@@ -1,0 +1,2 @@
+_extends: .github
+tag-template: negotiate-sso-$NEXT_MINOR_VERSION
