@@ -452,10 +452,15 @@ public final class NegotiateSSO extends GlobalConfiguration {
     }
     
     /**
-     * Used by groovy for data-binding.
-     *
+     * Used by groovy for data-binding: provides a name and java classpath for an HTML 'select' element
+     * 
+     * Suppressed warnings (for security scans):
+     * * permission check: the configuration page is restricted to 'ADMINISTER' permissions, but this function is only providing the potential choices, not changing settings
+     * * csrf: We do not provide routable URLs, only a text name (with spaces) and a java classpath reference for internal use
+     * 
      * @return the allowed provider strings
      */
+    @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
     public ListBoxModel doFillProvidersItems() {
         ListBoxModel items = new ListBoxModel();
         items.add("Negotiate, then Basic", NegotiateSecurityFilterProvider.class.getName() + " " + BasicSecurityFilterProvider.class.getName());
