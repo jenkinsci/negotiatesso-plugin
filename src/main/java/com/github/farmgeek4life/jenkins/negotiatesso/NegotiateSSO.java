@@ -43,6 +43,7 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import waffle.servlet.spi.BasicSecurityFilterProvider;
 import waffle.servlet.spi.NegotiateSecurityFilterProvider;
+import waffle.util.cache.CacheSupplier;
 
 /**
  * The core of this Plugin. Handles the configuration of the Waffle
@@ -167,8 +168,21 @@ public final class NegotiateSSO extends GlobalConfiguration {
             //config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", "Negotiate NTLM"); // split around any whitespace: \t\n\x0B\f\r
             config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", protocols); // split around any whitespace: \t\n\x0B\f\r
         }
-        
-        this.filter.init(config);
+
+        // Modify the thread's ClassLoader context so that the ServiceLoader call in waffle-jna-jakarta can succeed
+        NegotiateSSO.LOGGER.log(Level.FINEST, "adapt TCCL for waffle-jna-jakarta ServiceLoader call");
+        Thread thread = Thread.currentThread();
+        ClassLoader loader = thread.getContextClassLoader();
+        thread.setContextClassLoader(CacheSupplier.class.getClassLoader());
+
+        try {
+            this.filter.init(config);
+        } finally {
+            // Reset the thread's ClassLoader context to the previous value
+            NegotiateSSO.LOGGER.log(Level.FINEST, "reset TCCL");
+            thread.setContextClassLoader(loader);
+        }
+
         this.userSeedFilter = new NegSecUserSeedFilter();
         this.userSeedFilter.init(null);
         
