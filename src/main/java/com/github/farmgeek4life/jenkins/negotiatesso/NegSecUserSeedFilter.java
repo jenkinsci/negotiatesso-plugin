@@ -20,9 +20,9 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- * 
- *  Portions of this code are based on the KerberosSSO plugin, also licensed 
- *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
+ *
+ *  Portions of this code are based on the KerberosSSO plugin, also licensed
+ *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin
  *  for license details.
  */
 
@@ -68,10 +68,10 @@ public class NegSecUserSeedFilter implements Filter {
             WindowsPrincipal principal = (WindowsPrincipal) nrw.getUserPrincipal();
             authenticateJenkins(principal, (HttpServletRequest) request);
         }
-        
+
         chain.doFilter(request, response);
     }
-    
+
     /**
      * Perform the authentication methods for Jenkins
      */
@@ -91,10 +91,10 @@ public class NegSecUserSeedFilter implements Filter {
                         userDetails.getPassword(),
                         userDetails.getAuthorities());
         ACL.as2(authToken);
-        populateUserSeed(httpRequest, userDetails.getUsername());              
+        populateUserSeed(httpRequest, userDetails.getUsername());
         SecurityListener.fireLoggedIn(userDetails.getUsername());
     }
-    
+
     /**
      * This request is in a filter before the Stapler for pre-authentication for that reason we need to keep the code
      * that applies the same logic as UserSeedSecurityListener.
@@ -119,5 +119,5 @@ public class NegSecUserSeedFilter implements Filter {
     public void destroy() {
         // Nothing to do.
     }
-    
+
 }

@@ -32,7 +32,7 @@
     <!-- TODO JENKINS-73339 until in parent POM -->
     <jenkins-test-harness.version>2254.vcff7a_d4969e5</jenkins-test-harness.version>
     <maven.compiler.release>17</maven.compiler.release>
-    <waffle.version>2.3.0</waffle.version>
+    <waffle.version>3.4.0</waffle.version>
     <jna.version>5.14.0</jna.version><!-- Specified here because jna-platform does need to be the same version as jna -->
   </properties>
 
@@ -53,6 +53,12 @@
       <groupId>com.github.waffle</groupId>
       <artifactId>waffle-jna-jakarta</artifactId>
       <version>${waffle.version}</version>
+    </dependency>
+    <!-- waffle-jna-jakarta 3.4.0 caffeine dependency has a newer dependency on error_prone_annotations than plugin pom 4.87 / jenkins 2.475 -->
+    <dependency>
+      <groupId>com.google.errorprone</groupId>
+      <artifactId>error_prone_annotations</artifactId>
+      <version>2.21.1</version>
     </dependency>
     <!-- TODO JENKINS-73339 until in parent POM, work around https://github.com/jenkinsci/plugin-pom/issues/936 -->
     <dependency>

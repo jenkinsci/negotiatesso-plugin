@@ -20,9 +20,9 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- * 
- *  Portions of this code are based on the KerberosSSO plugin, also licensed 
- *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
+ *
+ *  Portions of this code are based on the KerberosSSO plugin, also licensed
+ *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin
  *  for license details.
  */
 
@@ -43,6 +43,7 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import waffle.servlet.spi.BasicSecurityFilterProvider;
 import waffle.servlet.spi.NegotiateSecurityFilterProvider;
+import waffle.util.cache.CacheSupplier;
 
 /**
  * The core of this Plugin. Handles the configuration of the Waffle
@@ -56,7 +57,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     private static final Logger LOGGER = Logger.getLogger(NegotiateSSO.class.getName());
 
     private boolean enabled = false;
-    
+
     private boolean redirectEnabled = false;
     private String redirect = "yourdomain.com";
     private boolean allowLocalhost = true;
@@ -79,7 +80,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         Jenkins jenkins = Jenkins.get();
         return jenkins.getDescriptorByType(NegotiateSSO.class);
     }
-    
+
     /**
      * Get the proper category for the settings location
      * @return GlobalConfigurationCategory.Security
@@ -88,7 +89,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     public GlobalConfigurationCategory getCategory() {
         return GlobalConfigurationCategory.get(GlobalConfigurationCategory.Security.class);
     }
-    
+
     /**
      * The Plugin Display name
      * @return Display name
@@ -97,7 +98,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     public String getDisplayName() {
         return "NegotiateSSO";
     }
-    
+
     /**
      * Initializes and starts the filter, if enabled.
      */
@@ -131,10 +132,10 @@ public final class NegotiateSSO extends GlobalConfiguration {
             removeFilter();
         }
     }
-    
+
     /**
      * Initializes the filter and inserts it into the chain
-     * @throws ServletException 
+     * @throws ServletException
      */
     private void startFilter() throws ServletException {
         if (!System.getProperty("os.name").toLowerCase().contains("win")) {
@@ -142,7 +143,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
             this.enabled = false;
             return;
         }
-        
+
         NegotiateSSO.LOGGER.log(Level.INFO, "Starting Security Filter");
         this.filter = new NegSecFilter();
         this.filter.setImpersonate(this.allowImpersonate);
@@ -158,7 +159,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         config.setParameter("securityFilterProviders", this.providers); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", NegotiateSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
         //config.setParameter("securityFilterProviders", BasicSecurityFilterProvider.class.getName()); // split around any whitespace: \t\n\x0B\f\r
-        
+
         //config.setParameter("allowLocalhost", String.valueOf(this.allowLocalhost));
         //config.setParameter("redirectEnabled", String.valueOf(this.redirectEnabled));
         //config.setParameter("redirect", this.redirect);
@@ -167,11 +168,24 @@ public final class NegotiateSSO extends GlobalConfiguration {
             //config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", "Negotiate NTLM"); // split around any whitespace: \t\n\x0B\f\r
             config.setParameter("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", protocols); // split around any whitespace: \t\n\x0B\f\r
         }
-        
-        this.filter.init(config);
+
+        // Modify the thread's ClassLoader context so that the ServiceLoader call in waffle-jna-jakarta can succeed
+        NegotiateSSO.LOGGER.log(Level.FINEST, "adapt TCCL for waffle-jna-jakarta ServiceLoader call");
+        Thread thread = Thread.currentThread();
+        ClassLoader loader = thread.getContextClassLoader();
+        thread.setContextClassLoader(CacheSupplier.class.getClassLoader());
+
+        try {
+            this.filter.init(config);
+        } finally {
+            // Reset the thread's ClassLoader context to the previous value
+            NegotiateSSO.LOGGER.log(Level.FINEST, "reset TCCL");
+            thread.setContextClassLoader(loader);
+        }
+
         this.userSeedFilter = new NegSecUserSeedFilter();
         this.userSeedFilter.init(null);
-        
+
         // https://github.com/dblock/waffle/blob/master/Docs/tomcat/TomcatSingleSignOnValve.md
         //    fqn: Fully qualified names, such as domain\\username. When unavailable, a SID is used. This is the default.
         //    sid: SID in the S- format.
@@ -192,7 +206,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
             this.filter.destroy();
             this.filter = null;
         }
-        
+
         if (this.userSeedFilter != null) {
             PluginServletFilter.removeFilter(this.userSeedFilter);
             this.userSeedFilter.destroy();
@@ -222,14 +236,14 @@ public final class NegotiateSSO extends GlobalConfiguration {
             }
             else if (formData.has("enabled")) {
                 JSONObject data = formData.getJSONObject("enabled");
-            
+
                 //NegotiateSSO.LOGGER.log(Level.SEVERE, "data: " + data.toString());
-                if (!data.has("allowImpersonate") || !data.has("roleFormat") 
-                        || !data.has("principalFormat") || !data.has("protocols") 
+                if (!data.has("allowImpersonate") || !data.has("roleFormat")
+                        || !data.has("principalFormat") || !data.has("protocols")
                         || !data.has("providers") || !data.has("allowLocalhost")) {
                     throw new Descriptor.FormException("Malformed form recieved. Try again.", "enabled");
                 }
-                
+
                 if (data.has("redirectEnabled")) {
                     JSONObject rData = data.getJSONObject("redirectEnabled");
                     //NegotiateSSO.LOGGER.log(Level.SEVERE, "rData: " + rData.toString());
@@ -250,24 +264,24 @@ public final class NegotiateSSO extends GlobalConfiguration {
                 else {
                     this.redirectEnabled = false;
                 }
-            
+
                 //Then processing data that it's up to the user to get correct.
                 this.enabled = true;
-            
+
                 this.allowImpersonate = data.getBoolean("allowImpersonate");
                 this.roleFormat = data.getString("roleFormat");
                 this.principalFormat = data.getString("principalFormat");
                 this.protocols = data.getString("protocols");
                 this.providers = data.getString("providers");
                 this.allowLocalhost = data.getBoolean("allowLocalhost");
-            
+
                 removeFilter();
                 startFilter();
             } else {
                 removeFilter();
                 this.enabled = false;
             }
-            
+
             save();
         }
         catch (ServletException e) {
@@ -409,7 +423,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
     public void setRedirect(String redirect) {
         this.redirect = redirect;
     }
-    
+
     /**
      * Used by groovy for data-binding.
      *
@@ -423,7 +437,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         items.add("No Principal Name", "none");
         return items;
     }
-    
+
     /**
      * Used by groovy for data-binding.
      *
@@ -436,7 +450,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         items.add("Both FQN and SID", "both");
         return items;
     }
-    
+
     /**
      * Used by groovy for data-binding.
      *
@@ -450,14 +464,14 @@ public final class NegotiateSSO extends GlobalConfiguration {
         items.add("NTLM only", "NTLM");
         return items;
     }
-    
+
     /**
      * Used by groovy for data-binding: provides a name and java classpath for an HTML 'select' element
-     * 
+     *
      * Suppressed warnings (for security scans):
      * * permission check: the configuration page is restricted to 'ADMINISTER' permissions, but this function is only providing the potential choices, not changing settings
      * * csrf: We do not provide routable URLs, only a text name (with spaces) and a java classpath reference for internal use
-     * 
+     *
      * @return the allowed provider strings
      */
     @SuppressWarnings({"lgtm[jenkins/no-permission-check]", "lgtm[jenkins/csrf]"})
