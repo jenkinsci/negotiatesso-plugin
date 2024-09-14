@@ -20,13 +20,13 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- * 
- *  This class extends a Waffle class. See https://github.com/dblock/waffle for 
- *  appropriate licenses for Waffle, which are not included here (as I do not 
+ *
+ *  This class extends a Waffle class. See https://github.com/dblock/waffle for
+ *  appropriate licenses for Waffle, which are not included here (as I do not
  *  include any source code from Waffle).
- * 
- *  Portions of this code are based on the KerberosSSO plugin, also licensed 
- *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin 
+ *
+ *  Portions of this code are based on the KerberosSSO plugin, also licensed
+ *  under the MIT License. See https://github.com/jenkinsci/kerberos-sso-plugin
  *  for license details.
  */
 
@@ -83,7 +83,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
             chain.doFilter(request, response);
             return;
         }
-        
+
         HttpServletRequest httpRequest = (HttpServletRequest)request;
         String requestUri = httpRequest.getRequestURI();
         // After Jenkins 1.590:
@@ -93,14 +93,14 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
             chain.doFilter(request, response);
             return;
         }
-        
+
         if (this.allowLocalhost && httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
             // User is localhost, and we want to skip authenticating localhost
             LOGGER.log(Level.FINEST, "Bypassing authentication for localhost to {0}", requestUri);
             chain.doFilter(request, response);
             return;
         }
-        
+
         if (this.redirectEnabled && !httpRequest.getLocalAddr().equals(httpRequest.getRemoteAddr())) {
             // If local and remote addresses are identical, user is localhost and shouldn't be redirected
             try {
@@ -121,7 +121,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
                 return;
             }
         }
-        
+
         // A user is "always" authenticated by Jenkins as anonymous when not authenticated in any other way.
         if (SecurityContextHolder.getContext().getAuthentication() == null
                 || !SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
@@ -135,10 +135,10 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
             LOGGER.log(Level.FINEST, "Bypassing filter - already authenticated: " + requestUri);
             chain.doFilter(request, response); // just continue down the filter chain
         }
-        
+
         //super.doFilter(request, response, chain); // This will also call the filter chaining
     }
-    
+
     /**
      * Remove the hostname and the query string from a requested URI
      * @param requestURI the requested URI
@@ -150,10 +150,10 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // if the request URI has a query string, delete it.
         return requestURI.replaceAll("^https?://[^/]+/", "/").replaceAll("\\?.*$", "");
     }
-    
+
     /**
      * Check a request URI to see if authentication should be attempted
-     * 
+     *
      * If a path is unprotected or always readable, don't attempt to authenticate.
      * Attempting to authenticate causes problems with things like the cli and notifyCommit URIs
      * @param jenkins jenkins instance; accessible for testing purposes (for getUnprotectedRootActions())
@@ -169,7 +169,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         // but we only care about the exceptions to the permissions check.
         // Trying to use jenkins.getTarget() always seemed to test against anonymous or everyone permissions,
         // so the user was never automatically authenticated.
-        
+
         // Code copied from Jenkins.getTarget(); need the rest, but not the permission check.
         String rest = cleanRequest(requestURI); //Stapler.getCurrentRequest().getRestOfPath() in Jenkins.getTarget()
 
@@ -198,14 +198,14 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
     private static boolean isAgentJnlpPath(String restOfPath, String prefix) {
         return restOfPath.matches("(/manage)?/computer/[^/]+/" + prefix + "-agent[.]jnlp");
     }
-    
+
     private static boolean containsBypassHeader(ServletRequest request) {
         if (!(request instanceof HttpServletRequest)) {
             return false;
         }
         return ((HttpServletRequest)request).getHeader(BYPASS_HEADER) != null;
     }
-    
+
     /**
      * @param doEnable if redirect should be enabled
      * @param redirectTo the site to redirect to
@@ -214,7 +214,7 @@ public final class NegSecFilter extends NegotiateSecurityFilter {
         this.redirectEnabled = doEnable;
         this.redirect = redirectTo;
     }
-    
+
     /**
      * @param allow if localhost should bypass the SSO authentication
      */

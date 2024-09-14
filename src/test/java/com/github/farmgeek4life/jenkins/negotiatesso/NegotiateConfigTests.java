@@ -20,9 +20,9 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
- * 
- *  This code is based on the KerberosSSO plugin, also licensed under the MIT 
- *  License. See https://github.com/jenkinsci/kerberos-sso-plugin for license 
+ *
+ *  This code is based on the KerberosSSO plugin, also licensed under the MIT
+ *  License. See https://github.com/jenkinsci/kerberos-sso-plugin for license
  *  details.
  */
 package com.github.farmgeek4life.jenkins.negotiatesso;
@@ -57,9 +57,9 @@ public class NegotiateConfigTests {
     // CS IGNORE VisibilityModifier FOR NEXT 3 LINES. REASON: Mocks tests.
     @Rule
     public RestartableJenkinsRule rule = new RestartableJenkinsRule();
-    
+
     /**
-     * 
+     *
      */
     private boolean IsWindowsOS() {
         return System.getProperty("os.name").toLowerCase().contains("win");
@@ -73,7 +73,7 @@ public class NegotiateConfigTests {
         rule.then(r -> {
             HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
             HtmlElement enabled = currentPage.getElementByName("_.enabled");
-            assertNotNull("Negotiate configuration page missing.", enabled);            
+            assertNotNull("Negotiate configuration page missing.", enabled);
         });
 
     }

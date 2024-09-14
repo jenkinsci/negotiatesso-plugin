@@ -38,7 +38,7 @@ import jakarta.servlet.ServletContext;
 public class SecurityFilterConfig implements FilterConfig {
     private final HashMap<String, String> params = new HashMap<String, String>();
     public static final Map<String, Boolean> ALLOWED_PARAMS;
-    
+
     static {
         HashMap<String, Boolean> allowedParams = new HashMap<String, Boolean>();
         allowedParams.put("principalFormat", Boolean.TRUE);
@@ -57,7 +57,7 @@ public class SecurityFilterConfig implements FilterConfig {
         allowedParams.put("waffle.servlet.spi.NegotiateSecurityFilterProvider/protocols", Boolean.TRUE); // NegotiateSecurityFilterProvider, valid values Negotiate, NTLM (string tokenized)
         ALLOWED_PARAMS = Collections.unmodifiableMap(allowedParams);
     }
-    
+
     public Boolean setParameter(String name, String value) {
         if (ALLOWED_PARAMS.containsKey(name)) {
             params.put(name, value);
@@ -65,7 +65,7 @@ public class SecurityFilterConfig implements FilterConfig {
         }
         return false;
     }
-    
+
     /**
      * Filter name
      * @return The name of the filter
@@ -74,7 +74,7 @@ public class SecurityFilterConfig implements FilterConfig {
     public String getFilterName() {
         return "NegSecFilter";
     }
-    
+
     /**
      * Servlet context
      * @return servlet context
@@ -101,5 +101,5 @@ public class SecurityFilterConfig implements FilterConfig {
     @Override
     public Enumeration<String> getInitParameterNames() {
         return Collections.enumeration(params.keySet());
-    }    
+    }
 }
