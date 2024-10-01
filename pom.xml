@@ -32,7 +32,7 @@
     <!-- TODO JENKINS-73339 until in parent POM -->
     <jenkins-test-harness.version>2254.vcff7a_d4969e5</jenkins-test-harness.version>
     <maven.compiler.release>17</maven.compiler.release>
-    <waffle.version>3.4.0</waffle.version>
+    <waffle.version>3.5.0</waffle.version>
     <jna.version>5.14.0</jna.version><!-- Specified here because jna-platform does need to be the same version as jna -->
   </properties>
 
