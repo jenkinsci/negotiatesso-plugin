@@ -5,7 +5,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.87</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
+    <version>5.3</version><!-- which version of Jenkins plugin pom is this plugin built against? -->
     <relativePath />
   </parent>
 
@@ -28,10 +28,9 @@
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/negotiatesso-plugin</gitHubRepo>
-    <jenkins.version>2.475</jenkins.version><!-- Upgrade to Spring Security 6.x -->
+    <jenkins.version>2.479.1</jenkins.version><!-- Upgrade to Spring Security 6.x -->
     <!-- TODO JENKINS-73339 until in parent POM -->
     <jenkins-test-harness.version>2254.vcff7a_d4969e5</jenkins-test-harness.version>
-    <maven.compiler.release>17</maven.compiler.release>
     <waffle.version>3.4.0</waffle.version>
     <jna.version>5.14.0</jna.version><!-- Specified here because jna-platform does need to be the same version as jna -->
   </properties>
@@ -40,8 +39,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.462.x</artifactId>
-        <version>3358.vea_fa_1f41504d</version>
+        <artifactId>bom-2.479.x</artifactId>
+        <version>3790.va_b_a_2d26d2b_69</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -64,12 +63,10 @@
     <dependency>
       <groupId>jakarta.servlet</groupId>
       <artifactId>jakarta.servlet-api</artifactId>
-      <version>5.0.0</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
-      <artifactId>jna</artifactId>
-      <version>${jna.version}</version><!-- Specified here because jna-platform does need to be the same version as jna -->
+      <artifactId>jna</artifactId><!-- Specified here because jna-platform does need to be the same version as jna -->
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>

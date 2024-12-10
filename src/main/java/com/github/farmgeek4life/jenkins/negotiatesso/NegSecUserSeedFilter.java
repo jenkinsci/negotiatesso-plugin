@@ -63,10 +63,9 @@ public class NegSecUserSeedFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        if (request instanceof NegotiateRequestWrapper) {
-            NegotiateRequestWrapper nrw = (NegotiateRequestWrapper) request;
+        if (request instanceof NegotiateRequestWrapper nrw) {
             WindowsPrincipal principal = (WindowsPrincipal) nrw.getUserPrincipal();
-            authenticateJenkins(principal, (HttpServletRequest) request);
+            authenticateJenkins(principal, nrw);
         }
 
         chain.doFilter(request, response);
