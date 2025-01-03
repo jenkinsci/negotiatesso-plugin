@@ -33,6 +33,7 @@ import hudson.model.Descriptor;
 import hudson.util.ListBoxModel;
 import hudson.util.PluginServletFilter;
 import jenkins.model.Jenkins;
+import jenkins.util.SetContextClassLoader;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest2;
 
@@ -170,17 +171,8 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
 
         // Modify the thread's ClassLoader context so that the ServiceLoader call in waffle-jna-jakarta can succeed
-        NegotiateSSO.LOGGER.log(Level.FINEST, "adapt TCCL for waffle-jna-jakarta ServiceLoader call");
-        Thread thread = Thread.currentThread();
-        ClassLoader loader = thread.getContextClassLoader();
-        thread.setContextClassLoader(CacheSupplier.class.getClassLoader());
-
-        try {
+        try (SetContextClassLoader sccl = new SetContextClassLoader(CacheSupplier.class)) {
             this.filter.init(config);
-        } finally {
-            // Reset the thread's ClassLoader context to the previous value
-            NegotiateSSO.LOGGER.log(Level.FINEST, "reset TCCL");
-            thread.setContextClassLoader(loader);
         }
 
         this.userSeedFilter = new NegSecUserSeedFilter();
