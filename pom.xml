@@ -141,6 +141,10 @@
         <artifactId>maven-enforcer-plugin</artifactId>
         <configuration>
           <rules combine.children="append">
+            <!--
+              If this Enforcer check ever starts failing, then add a <dependencyManagement> entry for jna-platform
+              matching the version delivered by core.
+            -->
             <requireSameVersions>
               <dependencies>
                 <dependency>net.java.dev.jna:jna</dependency>
