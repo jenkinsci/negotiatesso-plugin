@@ -44,7 +44,6 @@ import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import waffle.servlet.spi.BasicSecurityFilterProvider;
 import waffle.servlet.spi.NegotiateSecurityFilterProvider;
-import waffle.util.cache.CacheSupplier;
 
 /**
  * The core of this Plugin. Handles the configuration of the Waffle
