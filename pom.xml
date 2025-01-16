@@ -48,7 +48,7 @@
     <dependency>
       <groupId>com.github.waffle</groupId>
       <artifactId>waffle-jna-jakarta</artifactId>
-      <version>3.4.0</version>
+      <version>3.5.1</version>
       <exclusions>
         <!-- Provided by caffeine-api plugin -->
         <exclusion>
