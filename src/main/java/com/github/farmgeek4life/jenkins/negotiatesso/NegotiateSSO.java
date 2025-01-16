@@ -170,7 +170,7 @@ public final class NegotiateSSO extends GlobalConfiguration {
         }
 
         // Modify the thread's ClassLoader context so that the ServiceLoader call in waffle-jna-jakarta can succeed
-        try (SetContextClassLoader sccl = new SetContextClassLoader(NegotiateSSO.class)) {
+        try (SetContextClassLoader sccl = new SetContextClassLoader(CacheSupplier.class)) {
             this.filter.init(config);
         }
 
