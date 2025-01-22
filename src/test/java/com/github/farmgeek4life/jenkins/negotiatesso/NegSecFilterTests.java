@@ -1,40 +1,32 @@
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
 import jakarta.servlet.http.HttpServletRequest;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Rule;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.mockito.Mockito;
 
-public class NegSecFilterTests {
-    /**
-     * Time limit in seconds for timed tests.
-     */
-    public static final int TIME_LIMIT = 10;
-
-    /**
-     * Jenkins rule instance.
-     */
-    // CS IGNORE VisibilityModifier FOR NEXT 3 LINES. REASON: Mocks tests.
-    @Rule
-    public JenkinsRule rule = new JenkinsRule();
+@WithJenkins
+class NegSecFilterTests {
 
     @Test
-    public void test_cleanRequest() {
-        assertTrue(NegSecFilter.cleanRequest("http://host:8080/whoAmI").equals("/whoAmI"));
-        assertTrue(NegSecFilter.cleanRequest("http://host/whoAmI").equals("/whoAmI"));
-        assertTrue(NegSecFilter.cleanRequest("http://host/securityRealm").equals("/securityRealm"));
-        assertTrue(NegSecFilter.cleanRequest("https://host:8080/job/jobName").equals("/job/jobName"));
-        assertTrue(NegSecFilter.cleanRequest("http://host:8080/git/notifyCommit?url=http://gitserver/gitrepo.git").equals("/git/notifyCommit"));
-        assertTrue(NegSecFilter.cleanRequest("/whoAmI").equals("/whoAmI"));
-        assertTrue(NegSecFilter.cleanRequest("/git/notifyCommit?url=http://gitserver/gitrepo.git").equals("/git/notifyCommit"));
+    void test_cleanRequest(JenkinsRule rule) {
+        assertEquals("/whoAmI", NegSecFilter.cleanRequest("http://host:8080/whoAmI"));
+        assertEquals("/whoAmI", NegSecFilter.cleanRequest("http://host/whoAmI"));
+        assertEquals("/securityRealm", NegSecFilter.cleanRequest("http://host/securityRealm"));
+        assertEquals("/job/jobName", NegSecFilter.cleanRequest("https://host:8080/job/jobName"));
+        assertEquals("/git/notifyCommit", NegSecFilter.cleanRequest("http://host:8080/git/notifyCommit?url=http://gitserver/gitrepo.git"));
+        assertEquals("/whoAmI", NegSecFilter.cleanRequest("/whoAmI"));
+        assertEquals("/git/notifyCommit", NegSecFilter.cleanRequest("/git/notifyCommit?url=http://gitserver/gitrepo.git"));
     }
 
     @Test
-    public void test_shouldAttemptAuthentication() {
+    void test_shouldAttemptAuthentication(JenkinsRule rule) {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
 
         assertTrue(NegSecFilter.shouldAttemptAuthentication(rule.jenkins, request, "/job/SomeJob"));
@@ -50,7 +42,7 @@ public class NegSecFilterTests {
     }
 
     @Test
-    public void test_shouldNotAttemptAuthentication() {
+    void test_shouldNotAttemptAuthentication(JenkinsRule rule) {
         HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
         Mockito.when(request.getParameter("encrypt")).thenReturn("true");
 

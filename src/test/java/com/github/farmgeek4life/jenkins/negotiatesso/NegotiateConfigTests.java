@@ -27,68 +27,44 @@
  */
 package com.github.farmgeek4life.jenkins.negotiatesso;
 
-import org.htmlunit.FailingHttpStatusCodeException;
 import org.htmlunit.html.HtmlElement;
 import org.htmlunit.html.HtmlForm;
 import org.htmlunit.html.HtmlPage;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.model.Statement;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
-import org.jvnet.hudson.test.RestartableJenkinsRule.Step;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static hudson.Functions.isWindows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for the global configuration page of the plugin.
  * @author Bryson Gibbons
  */
-public class NegotiateConfigTests {
-    /**
-     * Time limit in seconds for timed tests.
-     */
-    public static final int TIME_LIMIT = 10;
-
-    /**
-     * Jenkins rule instance.
-     */
-    // CS IGNORE VisibilityModifier FOR NEXT 3 LINES. REASON: Mocks tests.
-    @Rule
-    public RestartableJenkinsRule rule = new RestartableJenkinsRule();
-
-    /**
-     *
-     */
-    private boolean IsWindowsOS() {
-        return System.getProperty("os.name").toLowerCase().contains("win");
-    }
+@WithJenkins
+class NegotiateConfigTests {
 
     /**
      * Tests if Negotiate SSO plugin has a section on the global config page.
      */
     @Test
-    public void testNegotiateHasConfigPage() {
-        rule.then(r -> {
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlElement enabled = currentPage.getElementByName("_.enabled");
-            assertNotNull("Negotiate configuration page missing.", enabled);
-        });
-
+    void testNegotiateHasConfigPage(JenkinsRule rule) throws Exception {
+        HtmlPage currentPage = rule.createWebClient().goTo("configureSecurity");
+        HtmlElement enabled = currentPage.getElementByName("_.enabled");
+        assertNotNull(enabled, "Negotiate configuration page missing.");
     }
 
     /**
      * Tests if Negotiate SSO plugin block can be expanded.
      */
     @Test
-    public void testEnableNegotiate() {
-        rule.then(r -> {
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlElement enabled = currentPage.getElementByName("_.enabled");
-            enabled.fireEvent("click");
-            assertNotNull("Optional block wasn't expanded.", currentPage.getElementByName("_.redirectEnabled"));
-        });
+    void testEnableNegotiate(JenkinsRule rule) throws Exception {
+        HtmlPage currentPage = rule.createWebClient().goTo("configureSecurity");
+        HtmlElement enabled = currentPage.getElementByName("_.enabled");
+        enabled.fireEvent("click");
+        assertNotNull(currentPage.getElementByName("_.redirectEnabled"), "Optional block wasn't expanded.");
     }
 
     /**
@@ -96,32 +72,25 @@ public class NegotiateConfigTests {
      * @throws Exception if something goes wrong
      */
     @Test
-    public void testIfConfigCanBeUpdated() throws Exception {
-        rule.then(r -> {
-            assertFalse("Plugin already enabled", NegotiateSSO.getInstance().getEnabled());
+    void testIfConfigCanBeUpdated(JenkinsRule rule) throws Exception {
+        assertFalse(NegotiateSSO.getInstance().getEnabled(), "Plugin already enabled");
 
-            HtmlPage currentPage = rule.j.createWebClient().goTo("configureSecurity");
-            HtmlForm form = currentPage.getFormByName("config");
-            assertNotNull(form);
+        HtmlPage currentPage = rule.createWebClient().goTo("configureSecurity");
+        HtmlForm form = currentPage.getFormByName("config");
+        assertNotNull(form);
 
-            form.getInputByName("_.enabled").click();
-            form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
-            form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
+        form.getInputByName("_.enabled").click();
+        form.getSelectByName("_.principalFormat").setSelectedAttribute("both", true);
+        form.getSelectByName("_.roleFormat").setSelectedAttribute("sid", true);
 
-            try {
-                rule.j.submit(form);
-                // CS IGNORE EmptyBlock FOR NEXT 3 LINES. REASON: Mocks Tests.
-            } catch (FailingHttpStatusCodeException e) {
-                // Expected since filter cannot be added to Jenkins rule.
-            }
+        rule.submit(form);
 
-            boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
-            if (IsWindowsOS()) {
-                assertTrue("Plugin wasn't enabled after saving the new config", wasEnabled);
-            }
-            else {
-                assertFalse("Plugin was enabled on a non-Windows OS", wasEnabled);
-            }
-        });
+        boolean wasEnabled = NegotiateSSO.getInstance().getEnabled();
+        if (isWindows()) {
+            assertTrue(wasEnabled, "Plugin wasn't enabled after saving the new config");
+        }
+        else {
+            assertFalse(wasEnabled, "Plugin was enabled on a non-Windows OS");
+        }
     }
 }
